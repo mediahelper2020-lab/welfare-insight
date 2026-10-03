@@ -249,6 +249,7 @@
         </section>`).join("")}
       <div class="sy-foot">
         ※ 모든 과정은 기관의 사업영역·참여자 수준·교육시간에 맞춰 조정할 수 있으며, 개인정보 보호와 비식별화 원칙을 함께 교육합니다.<br />
+        ※ 교육시간: 실습 교육은 1회 3~8시간(시간 단위), 1~2시간은 기조강연 형태로만 진행 · 여러 회차(예: 3회 × 4시간) 신청 가능<br />
         문의 ${esc(CONTACT.phone)} · ${esc(CONTACT.email)}
       </div>
       <div class="md-actions no-print">
@@ -316,7 +317,8 @@
      CUSTOM — 맞춤교육 빌더
      ========================================================= */
   const builder = $("#builder");
-  const state = { org: "center", hours: 6, level: "beginner" };
+  const state = { org: "center", hours: 6, sessions: 1, level: "beginner" };
+  const NUM_KEYS = ["hours", "sessions"];
 
   $$(".choice-group", builder).forEach((g) => {
     const key = g.dataset.group;
@@ -329,13 +331,15 @@
     const c = e.target.closest(".choice");
     if (!c) return;
     const key = c.dataset.key;
-    state[key] = key === "hours" ? Number(c.dataset.val) : c.dataset.val;
+    if (c.disabled) return;
+    state[key] = NUM_KEYS.includes(key) ? Number(c.dataset.val) : c.dataset.val;
+    if (key === "hours" && state.hours <= 2) state.sessions = 1; // 기조강연은 1회
     $$(".example-chip").forEach((x) => x.classList.remove("active"));
     renderBuilder();
   });
   $$(".example-chip").forEach((chip) => chip.addEventListener("click", () => {
-    const [org, hours, level] = chip.dataset.example.split(",");
-    Object.assign(state, { org, hours: Number(hours), level });
+    const [org, hours, level, sessions] = chip.dataset.example.split(",");
+    Object.assign(state, { org, hours: Number(hours), level, sessions: Number(sessions) || 1 });
     $$(".example-chip").forEach((x) => x.classList.toggle("active", x === chip));
     renderBuilder();
     if (window.innerWidth <= 1024) builder.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -345,26 +349,36 @@
     const org = CUSTOM_OPTIONS.org.find((o) => o.id === state.org);
     const lvl = CUSTOM_OPTIONS.level.find((o) => o.id === state.level);
     const hrs = CUSTOM_OPTIONS.hours.find((o) => o.id === state.hours);
+    const keynote = hrs.id <= 2;
+    const ses = keynote ? 1 : state.sessions;
+    const total = hrs.id * ses;
     let mods = [...org.modules];
     if (lvl.id === "beginner") mods.unshift(lvl.intro);
     if (lvl.id === "advanced") mods.push(lvl.intro);
-    const take = { 2: 2, 3: 3, 6: 4, 12: mods.length }[hrs.id];
-    mods = mods.slice(0, take);
-    if (hrs.id === 12) mods.push("현장 적용 프로젝트");
+    if (keynote) {
+      mods = ["AI 시대의 사회복지 (기조강연)", `${org.modules[0]} 활용 사례`];
+    } else {
+      const take = total <= 3 ? 3 : total <= 5 ? 4 : mods.length;
+      mods = mods.slice(0, take);
+      if (total >= 12) mods.push("현장 적용 프로젝트");
+    }
     const hasSafety = mods.some((m) => /개인정보|민감정보/.test(m));
     const courses = [...new Set([...(lvl.id === "beginner" ? [lvl.course] : []), ...org.courses, ...(lvl.id === "advanced" ? [9] : [])])].slice(0, 3);
-    return { org, lvl, hrs, mods, hasSafety, courses };
+    const timeLabel = keynote ? "1~2시간 기조강연 (1회)" : ses > 1 ? `${hrs.id}시간 × ${ses}회 (총 ${total}시간)` : `${hrs.id}시간`;
+    return { org, lvl, hrs, ses, total, keynote, timeLabel, mods, hasSafety, courses };
   }
 
   function renderBuilder() {
     $$(".choice", builder).forEach((c) => {
-      const val = c.dataset.key === "hours" ? Number(c.dataset.val) : c.dataset.val;
+      const val = NUM_KEYS.includes(c.dataset.key) ? Number(c.dataset.val) : c.dataset.val;
       c.setAttribute("aria-pressed", String(state[c.dataset.key] === val));
+      if (c.dataset.key === "sessions") c.disabled = state.hours <= 2 && val !== 1;
     });
     const p = buildPlan();
     const chips = p.mods.map((m) => `<span>${esc(m)}</span>`);
     if (!p.hasSafety) chips.push(`<span class="safe">개인정보 보호</span>`);
     $("#builderResult").innerHTML = `
+      <p class="br-time">${icon("clock")}${esc(p.timeLabel)}</p>
       <div class="br-modules">${chips.join("")}</div>
       <div class="br-courses">
         ${p.courses.map((no) => { const c = courseOf(no); return `<button type="button" data-open-course="${no}"><b>${pad(no)}</b>${esc(c.title)}</button>`; }).join("")}
@@ -378,11 +392,13 @@
     const orgMap = { center: "사회복지관", ltc: "장기요양기관", disability: "장애인복지시설", child: "아동복지기관", mental: "정신건강복지기관", manager: "" };
     form.elements.type.value = "기관 맞춤교육 문의";
     if (orgMap[p.org.id]) form.elements.orgType.value = orgMap[p.org.id];
-    form.elements.hours.value = p.hrs.id === 12 ? "12시간 이상" : p.hrs.label;
+    form.elements.hours.value = p.keynote ? "1~2시간 (기조강연)" : p.hrs.label;
+    form.elements.sessions.value = `${p.ses}회`;
+    updateHoursHint();
     if (!form.elements.target.value) form.elements.target.value = p.org.id === "manager" ? "관리자" : p.lvl.label;
     selectTopics(p.courses);
     const mods = p.mods.concat(p.hasSafety ? [] : ["개인정보 보호"]).join(" + ");
-    if (!form.elements.message.value.trim()) form.elements.message.value = `[맞춤교육 미리보기] ${p.org.label} / ${p.hrs.label} / ${p.lvl.label}\n희망 구성: ${mods}`;
+    if (!form.elements.message.value.trim()) form.elements.message.value = `[맞춤교육 미리보기] ${p.org.label} / ${p.timeLabel} / ${p.lvl.label}\n희망 구성: ${mods}`;
     goContact();
   });
 
@@ -460,6 +476,34 @@
   $("#topicChips").innerHTML = COURSES.map((c) => `
     <label class="topic-chip"><input type="checkbox" name="topics" value="${c.no}" /><span><b>${pad(c.no)}</b>${esc(c.title)}</span></label>`).join("");
 
+  /* 교육시간: 1회 시간 × 회차 */
+  const hoursHint = $("#hoursHint");
+  function timeText() {
+    const h = form.elements.hours.value, n = form.elements.sessions.value;
+    if (!h && !n) return "";
+    if (h.includes("기조강연")) return "1~2시간 기조강연 (1회)";
+    const hNum = parseInt(h, 10), nNum = parseInt(n, 10);
+    if (hNum && nNum) return nNum > 1 ? `${hNum}시간 × ${nNum}회 (총 ${hNum * nNum}시간)` : `${hNum}시간 (1회)`;
+    return [h && `1회 ${h}`, n && `${n}`].filter(Boolean).join(" / ");
+  }
+  function updateHoursHint() {
+    const sesSel = form.elements.sessions;
+    const keynote = form.elements.hours.value.includes("기조강연");
+    if (keynote) sesSel.value = "1회";
+    sesSel.disabled = keynote;
+    const h = parseInt(form.elements.hours.value, 10), n = parseInt(sesSel.value, 10);
+    markSelects();
+    hoursHint.innerHTML = keynote
+      ? "1~2시간은 <b>기조강연</b> 형태로만 진행됩니다."
+      : h && n > 1 ? `총 <b>${h * n}시간</b> (${n}회 × ${h}시간)` : "";
+  }
+  // 선택된 드롭다운은 글자색을 진하게
+  const markSelects = () => $$("select", form).forEach((sel) => sel.classList.toggle("has-value", !!sel.value));
+  form.addEventListener("change", markSelects);
+  form.addEventListener("reset", () => setTimeout(markSelects));
+  form.elements.hours.addEventListener("change", updateHoursHint);
+  form.elements.sessions.addEventListener("change", updateHoursHint);
+
   const topicCount = $("#topicCount");
   function updateTopicCount() {
     const n = $$('input[name="topics"]:checked', form).length;
@@ -490,7 +534,7 @@
       ["이메일", f.email.value],
       ["교육대상·인원", f.target.value],
       ["희망일정", f.date.value],
-      ["교육시간", f.hours.value],
+      ["교육시간", timeText()],
       ["희망 교육과정", topics.join(", ")],
       ["문의내용", f.message.value],
     ].filter(([, v]) => v && v.trim()).map(([k, v]) => `■ ${k}: ${v.trim()}`).join("\n");
@@ -525,7 +569,7 @@
     const data = {
       "문의 유형": f.type.value, "기관명": f.org.value, "기관 유형": f.orgType.value, "담당자": f.name.value,
       "연락처": f.phone.value, "이메일": f.email.value, "교육대상·인원": f.target.value, "희망일정": f.date.value,
-      "교육시간": f.hours.value, "희망 교육과정": topics.join(", "), "문의내용": f.message.value,
+      "교육시간": timeText(), "희망 교육과정": topics.join(", "), "문의내용": f.message.value,
     };
     Object.keys(data).forEach((k) => { data[k] = String(data[k]).trim(); if (!data[k]) delete data[k]; });
     return data;
@@ -541,7 +585,7 @@
         <button type="button" class="btn btn-line" id="formAgain">새 신청 작성</button>
       </div>`);
     $("#formAgain").addEventListener("click", () => {
-      form.reset(); updateTopicCount();
+      form.reset(); updateTopicCount(); updateHoursHint();
       form.classList.remove("is-done");
       $(".form-done", form).remove();
       formMsg.textContent = "";

@@ -213,6 +213,7 @@
         <button type="button" class="example-chip" data-example="center,6,beginner">사회복지관 · 6h · 초급</button>
         <button type="button" class="example-chip" data-example="ltc,3,practitioner">장기요양 · 3h · 실무자</button>
         <button type="button" class="example-chip" data-example="manager,3,practitioner">관리자 · 3h</button>
+        <button type="button" class="example-chip" data-example="center,4,practitioner,3">사회복지관 · 4h × 3회</button>
       </div>
     </div>
 
@@ -224,6 +225,10 @@
       <div class="builder-step">
         <p class="builder-label">시간</p>
         <div class="choice-group" data-group="hours"></div>
+      </div>
+      <div class="builder-step">
+        <p class="builder-label">회차</p>
+        <div class="choice-group" data-group="sessions"></div>
       </div>
       <div class="builder-step">
         <p class="builder-label">수준</p>
@@ -287,7 +292,7 @@
         <li><strong>6,500명</strong><span>스터디 카페</span></li>
       </ul>
       <div class="badge-row">
-        <span>사회복지사 1급</span><span>인공지능데이터전문가 1급</span><span>대한민국인재상</span>
+        <span>사회복지사 1급</span><span>인공지능데이터전문가 1급</span><span>청소년지도사 2급</span><span>대한민국인재상</span>
       </div>
       <div class="btn-row">
         <button type="button" class="btn btn-dark" data-open-profile>상세 프로필</button>
@@ -402,13 +407,25 @@
         <input name="phone" type="tel" required placeholder="연락처 *" aria-label="연락처 (필수)" />
         <input name="email" type="email" placeholder="이메일" aria-label="이메일" />
       </div>
-      <div class="form-row three">
+      <div class="form-row two">
         <input name="target" placeholder="대상·인원" aria-label="교육대상·인원" />
         <input name="date" placeholder="희망일정" aria-label="희망일정" />
-        <select name="hours" aria-label="교육시간">
-          <option value="">교육시간</option><option>2시간</option><option>3시간</option><option>6시간</option><option>12시간 이상</option><option>협의</option>
+      </div>
+      <div class="form-row two">
+        <select name="hours" aria-label="1회 교육시간">
+          <option value="">1회 교육시간</option>
+          <option value="1~2시간 (기조강연)">1~2시간 (기조강연)</option>
+          <option>3시간</option><option>4시간</option><option>5시간</option><option>6시간</option><option>7시간</option><option>8시간</option>
+          <option>협의</option>
+        </select>
+        <select name="sessions" aria-label="회차">
+          <option value="">회차</option>
+          <option>1회</option><option>2회</option><option>3회</option><option>4회</option><option>5회</option>
+          <option>6회</option><option>7회</option><option>8회</option><option>9회</option><option>10회</option>
+          <option>협의</option>
         </select>
       </div>
+      <p class="hours-hint" id="hoursHint" aria-live="polite"></p>
       <details class="topic-field">
         <summary>희망 과정 선택 <span id="topicCount"></span></summary>
         <div class="topic-chips" id="topicChips"></div>
