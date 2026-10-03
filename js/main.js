@@ -512,8 +512,46 @@
   form.addEventListener("input", (e) => { if (e.target.classList.contains("invalid") && e.target.value.trim()) e.target.classList.remove("invalid"); });
   form.elements.agree.addEventListener("change", (e) => e.target.closest(".agree").classList.toggle("invalid", !e.target.checked));
 
-  form.addEventListener("submit", (e) => {
+  function openMail() {
+    const subject = `[복지인사이트 교육문의] ${form.elements.org.value.trim()} - ${form.elements.type.value}`;
+    const body = collect() + "\n\n— 복지인사이트 홈페이지에서 보낸 문의입니다.";
+    window.location.href = `mailto:${CONTACT.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }
+
+  // 메일 본문 표에 들어갈 항목 (키가 그대로 메일의 항목 이름이 됩니다)
+  function mailFields() {
+    const f = form.elements;
+    const topics = $$('input[name="topics"]:checked', form).map((cb) => { const c = courseOf(cb.value); return `${pad(c.no)} ${c.title}`; });
+    const data = {
+      "문의 유형": f.type.value, "기관명": f.org.value, "기관 유형": f.orgType.value, "담당자": f.name.value,
+      "연락처": f.phone.value, "이메일": f.email.value, "교육대상·인원": f.target.value, "희망일정": f.date.value,
+      "교육시간": f.hours.value, "희망 교육과정": topics.join(", "), "문의내용": f.message.value,
+    };
+    Object.keys(data).forEach((k) => { data[k] = String(data[k]).trim(); if (!data[k]) delete data[k]; });
+    return data;
+  }
+
+  function showDone() {
+    form.classList.add("is-done");
+    form.insertAdjacentHTML("beforeend", `
+      <div class="form-done" role="status">
+        <span class="fd-icon">${icon("check")}</span>
+        <h3>신청이 접수되었습니다</h3>
+        <p>${esc(form.elements.name.value.trim())}님, 확인 후 빠르게 연락드리겠습니다.<br />급한 문의는 <a href="tel:${CONTACT.phone}">${CONTACT.phone}</a></p>
+        <button type="button" class="btn btn-line" id="formAgain">새 신청 작성</button>
+      </div>`);
+    $("#formAgain").addEventListener("click", () => {
+      form.reset(); updateTopicCount();
+      form.classList.remove("is-done");
+      $(".form-done", form).remove();
+      formMsg.textContent = "";
+    });
+  }
+
+  const submitBtn = $('button[type="submit"]', form);
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    if (submitBtn.disabled) return;
     if (!validate()) {
       formMsg.className = "form-msg err";
       formMsg.textContent = "필수 항목(기관명·담당자·연락처)과 개인정보 동의를 확인해 주세요.";
@@ -521,11 +559,36 @@
       if (first) (first.matches("input,select,textarea") ? first : $("input", first)).focus();
       return;
     }
-    const subject = `[복지인사이트 교육문의] ${form.elements.org.value.trim()} - ${form.elements.type.value}`;
-    const body = collect() + "\n\n— 복지인사이트 홈페이지에서 보낸 문의입니다.";
-    window.location.href = `mailto:${CONTACT.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    formMsg.className = "form-msg ok";
-    formMsg.textContent = "이메일 창이 열렸습니다. 내용을 확인하고 ‘보내기’를 눌러주세요.";
+    if (form.elements._honey.value) return; // 자동 스팸 차단
+
+    const label = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span> 보내는 중…';
+    formMsg.textContent = "";
+    try {
+      // FormSubmit: 입력 내용을 CONTACT.email 메일함으로 바로 보내 줍니다.
+      const res = await fetch(`https://formsubmit.co/ajax/${CONTACT.email}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          ...mailFields(),
+          _subject: `[복지인사이트 교육신청] ${form.elements.org.value.trim()} · ${form.elements.name.value.trim()}`,
+          _replyto: form.elements.email.value.trim() || undefined,
+          _template: "table",
+          _captcha: "false",
+        }),
+      });
+      const out = await res.json().catch(() => ({}));
+      if (!res.ok || String(out.success) !== "true") throw new Error(out.message || "failed");
+      showDone();
+    } catch (err) {
+      formMsg.className = "form-msg err";
+      formMsg.innerHTML = `전송에 실패했습니다. <button type="button" class="link-btn" id="mailFallback">메일 앱으로 보내기</button> 또는 ${CONTACT.phone}로 연락주세요.`;
+      $("#mailFallback").addEventListener("click", openMail);
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = label;
+    }
   });
 
   $("#copyForm").addEventListener("click", async () => {

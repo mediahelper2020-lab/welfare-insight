@@ -393,6 +393,7 @@
     <form class="contact-form" id="contactForm" novalidate>
       <input type="hidden" name="type" value="기관 맞춤교육 문의" />
       <input type="hidden" name="orgType" value="" />
+      <label class="hp" aria-hidden="true">홈페이지 <input name="_honey" tabindex="-1" autocomplete="off" /></label>
       <div class="form-row two">
         <input name="org" required placeholder="기관명 *" aria-label="기관명 (필수)" />
         <input name="name" required placeholder="담당자 *" aria-label="담당자 (필수)" />
@@ -415,7 +416,7 @@
       <textarea name="message" rows="3" placeholder="문의내용" aria-label="문의내용"></textarea>
       <label class="agree"><input type="checkbox" name="agree" required /> 개인정보 수집·이용 동의 (문의 응대용)</label>
       <button type="submit" class="btn btn-accent btn-lg btn-block">문의 보내기 <svg><use href="#i-arrow"/></svg></button>
-      <p class="form-note">메일 창이 열립니다 · <button type="button" class="link-btn" id="copyForm">내용 복사</button></p>
+      <p class="form-note">담당자 메일로 바로 전달됩니다 · <button type="button" class="link-btn" id="copyForm">내용 복사</button></p>
       <p class="form-msg" id="formMsg" role="status"></p>
     </form>
   </div>
