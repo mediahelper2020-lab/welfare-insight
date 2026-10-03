@@ -426,8 +426,12 @@
         </select>
       </div>
       <p class="hours-hint" id="hoursHint" aria-live="polite"></p>
+      <div class="topic-custom">
+        <label for="customTopic"><svg><use href="#i-sparkle"/></svg>희망 교육 주제 <small>직접 입력</small></label>
+        <input id="customTopic" name="customTopic" placeholder="예: 사례관리 기록에 AI 활용, 직원 대상 ChatGPT 입문" />
+      </div>
       <details class="topic-field">
-        <summary>희망 과정 선택 <span id="topicCount"></span></summary>
+        <summary>또는 20개 과정에서 선택 <span id="topicCount"></span></summary>
         <div class="topic-chips" id="topicChips"></div>
       </details>
       <textarea name="message" rows="3" placeholder="문의내용" aria-label="문의내용"></textarea>

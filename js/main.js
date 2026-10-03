@@ -535,6 +535,7 @@
       ["교육대상·인원", f.target.value],
       ["희망일정", f.date.value],
       ["교육시간", timeText()],
+      ["희망 교육주제(직접 입력)", f.customTopic.value],
       ["희망 교육과정", topics.join(", ")],
       ["문의내용", f.message.value],
     ].filter(([, v]) => v && v.trim()).map(([k, v]) => `■ ${k}: ${v.trim()}`).join("\n");
@@ -569,7 +570,7 @@
     const data = {
       "문의 유형": f.type.value, "기관명": f.org.value, "기관 유형": f.orgType.value, "담당자": f.name.value,
       "연락처": f.phone.value, "이메일": f.email.value, "교육대상·인원": f.target.value, "희망일정": f.date.value,
-      "교육시간": timeText(), "희망 교육과정": topics.join(", "), "문의내용": f.message.value,
+      "교육시간": timeText(), "희망 교육주제(직접 입력)": f.customTopic.value, "희망 교육과정": topics.join(", "), "문의내용": f.message.value,
     };
     Object.keys(data).forEach((k) => { data[k] = String(data[k]).trim(); if (!data[k]) delete data[k]; });
     return data;
