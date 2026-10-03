@@ -576,6 +576,30 @@
     return data;
   }
 
+  // Apps Script 웹앱으로 전송 → 시트 저장 + 문자 알림. 성공하면 true
+  async function sendToSheet() {
+    const f = form.elements;
+    const topics = $$('input[name="topics"]:checked', form).map((cb) => { const c = courseOf(cb.value); return `${pad(c.no)} ${c.title}`; });
+    try {
+      // text/plain 으로 보내야 브라우저 사전요청(CORS) 없이 Apps Script에 전달됩니다.
+      const res = await fetch(CONTACT.formEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          type: f.type.value, org: f.org.value, orgType: f.orgType.value, name: f.name.value,
+          phone: f.phone.value, email: f.email.value, target: f.target.value, date: f.date.value,
+          hours: timeText(), customTopic: f.customTopic.value, topics: topics.join(", "),
+          message: f.message.value, agree: f.agree.checked, _honey: f._honey.value,
+        }),
+      });
+      const out = await res.json();
+      return out.ok === true;
+    } catch (err) {
+      console.warn("시트 전송 실패 → 메일로 전송합니다.", err);
+      return false;
+    }
+  }
+
   function showDone() {
     form.classList.add("is-done");
     form.insertAdjacentHTML("beforeend", `
@@ -613,7 +637,7 @@
     };
 
     // 내 컴퓨터에서 파일(index.html)을 바로 열면 FormSubmit이 전송을 막습니다.
-    if (location.protocol === "file:") {
+    if (location.protocol === "file:" && !CONTACT.formEndpoint) {
       fail("이 페이지를 파일로 직접 열면 메일 전송이 되지 않습니다. 홈페이지 주소(웹에 올린 사이트)에서는 정상 전송됩니다.");
       return;
     }
@@ -623,7 +647,11 @@
     submitBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span> 보내는 중…';
     formMsg.textContent = "";
     try {
-      // FormSubmit: 입력 내용을 CONTACT.email 메일함으로 바로 보내 줍니다.
+      // ① 구글 시트 저장 + 문자 알림 (Apps Script) — 설정된 경우
+      if (CONTACT.formEndpoint && await sendToSheet()) { showDone(); return; }
+      if (location.protocol === "file:") { fail("전송에 실패했습니다. 홈페이지 주소(웹에 올린 사이트)에서 다시 시도해 주세요."); return; }
+
+      // ② 메일 전송 (FormSubmit) — 시트 미설정이거나 시트 전송 실패 시
       const res = await fetch(`https://formsubmit.co/ajax/${CONTACT.email}`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },

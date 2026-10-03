@@ -25,12 +25,10 @@ GitHub Pages·Netlify 등에 그대로 올리면 됩니다.
 - **강사 사진**: `assets/img/instructor.jpg`를 넣고 `index.html`의 강사 소개 영역 주석을 해제합니다.
 - **교육 후기**: `REVIEWS`는 예시 문구입니다. 실제 후기 원문으로 교체해 주세요.
 
-## 문의폼 동작
+## 문의폼 동작 (교육신청)
 
-"문의 보내기"를 누르면 입력 내용이 [FormSubmit](https://formsubmit.co)(무료 메일 전송 서비스)을 통해
-`js/data.js`의 `CONTACT.email`(mediahelper2020@gmail.com) 메일함으로 **바로 전송**됩니다.
-
-- **처음 한 번 인증 필요**: 사이트에서 첫 문의를 보내면 FormSubmit이 위 메일로 "Activate Form" 확인 메일을 보냅니다.
-  메일 안의 버튼을 한 번 누르면 그다음부터 모든 신청이 메일로 들어옵니다. (첫 문의도 인증 후 전달됨)
-- 받는 메일을 바꾸려면 `CONTACT.email`만 수정하고, 새 주소로 다시 한 번 인증하면 됩니다.
-- 전송에 실패하면 "메일 앱으로 보내기" 버튼이 나타나 기존 방식(mailto)으로 보낼 수 있습니다.
+1. `js/data.js`의 `formEndpoint`에 Apps Script 웹앱 주소가 있으면 → **구글 시트 저장 + 담당자 문자 알림**
+   설정 방법: [`apps-script/README.md`](apps-script/README.md)
+2. 주소가 비어 있거나 시트 전송이 실패하면 → [FormSubmit](https://formsubmit.co)으로 `CONTACT.email` 메일함에 **바로 전송**
+   - 처음 한 번은 FormSubmit이 보내는 "Activate Form" 인증 메일의 버튼을 눌러야 이후 메일이 들어옵니다.
+3. 둘 다 실패하면 "메일 앱으로 보내기" 버튼과 전화번호를 안내합니다.
