@@ -97,13 +97,12 @@
      ========================================================= */
   const tabsEl = $("#trackTabs");
   const gridEl = $("#courseGrid");
-  const descEl = $("#trackDesc");
   const emptyEl = $("#courseEmpty");
   const searchEl = $("#courseSearch");
   let currentTrack = "all";
 
-  const tabList = [{ id: "all", name: "전체 과정", count: COURSES.length }]
-    .concat(TRACKS.map((t) => ({ id: t.id, name: `${t.no} ${t.name}`, count: COURSES.filter((c) => c.track === t.id).length })));
+  const tabList = [{ id: "all", name: "전체", count: COURSES.length }]
+    .concat(TRACKS.map((t) => ({ id: t.id, name: t.short, count: COURSES.filter((c) => c.track === t.id).length })));
 
   tabsEl.innerHTML = tabList.map((t) => `
     <button type="button" role="tab" class="track-tab" data-track="${t.id}" aria-selected="${t.id === "all"}">
@@ -128,25 +127,14 @@
       return hay.includes(q);
     });
 
-    const t = trackOf(currentTrack);
-    descEl.innerHTML = t
-      ? `<b>${esc(t.name)}</b> — ${esc(t.desc)}`
-      : `<b>4개 분야 20개 과정</b> — 통합교육 · 도구별 · 주제별 · 영역별`;
-    if (q) descEl.innerHTML += ` <span>· “${esc(searchEl.value.trim())}” 검색결과 ${list.length}개</span>`;
-
     gridEl.innerHTML = list.map((c, i) => `
       <button type="button" class="course-card" data-open-course="${c.no}" style="animation-delay:${Math.min(i, 12) * 35}ms">
         <span class="course-top">
           <span class="course-no">${pad(c.no)}</span>
-          <span class="level level-${esc(c.level.split(" ")[0])}">${esc(c.level)}</span>
+          <span class="level">${esc(c.level)}</span>
         </span>
-        <span class="course-track">${esc(trackOf(c.track).name)}</span>
         <h3>${esc(c.title)}</h3>
-        <p>${esc(c.summary)}</p>
-        <span class="course-meta">
-          <span>${icon("clock")}${esc(c.hours)}</span>
-          <span class="more">자세히 ${icon("arrow")}</span>
-        </span>
+        <span class="course-go">${icon("arrow-up-right")}</span>
       </button>`).join("");
     emptyEl.hidden = list.length > 0;
   }
@@ -377,11 +365,9 @@
     const chips = p.mods.map((m) => `<span>${esc(m)}</span>`);
     if (!p.hasSafety) chips.push(`<span class="safe">개인정보 보호</span>`);
     $("#builderResult").innerHTML = `
-      <p class="br-title"><b>${esc(p.org.label)} + ${esc(p.hrs.label)} + ${esc(p.lvl.label)}</b> 추천 구성</p>
-      <div class="br-modules">${chips.join("<i>+</i>")}</div>
+      <div class="br-modules">${chips.join("")}</div>
       <div class="br-courses">
-        <p>관련 전문교육 과정</p>
-        ${p.courses.map((no) => { const c = courseOf(no); return `<button type="button" data-open-course="${no}"><b>${pad(no)}</b>${esc(c.title)}${icon("arrow")}</button>`; }).join("")}
+        ${p.courses.map((no) => { const c = courseOf(no); return `<button type="button" data-open-course="${no}"><b>${pad(no)}</b>${esc(c.title)}</button>`; }).join("")}
       </div>`;
   }
   renderBuilder();
@@ -408,7 +394,6 @@
       <span class="ps-num">STEP ${pad(i + 1)}</span>
       <span class="ps-icon">${icon(s.icon)}</span>
       <h3>${esc(s.title)}</h3>
-      <p>${esc(s.desc)}</p>
     </li>`).join("");
 
   const FIELD_STYLE = {
@@ -435,17 +420,12 @@
       const [c1, c2, ic] = FIELD_STYLE[p.cat] || ["#2a2d12", "#5d6b1e", "image"];
       const thumb = p.image
         ? `<img src="${esc(p.image)}" alt="${esc(p.topic)} 교육 현장" loading="lazy" />`
-        : `<span class="ph">${icon(ic)}교육 현장 사진</span>`;
+        : `<span class="ph">${icon(ic)}</span>`;
       return `
         <article class="field-card" style="animation-delay:${i * 50}ms">
-          <div class="field-thumb" style="background:linear-gradient(135deg, ${c1}, ${c2})">
-            ${thumb}
-            <span class="field-cat">${esc(p.type)}</span>
-          </div>
-          <div class="field-body">
-            <h3>${esc(p.topic)}</h3>
-            <p>${esc(p.type)}</p>
-          </div>
+          <div class="field-thumb" style="background:linear-gradient(135deg, ${c1}, ${c2})">${thumb}</div>
+          <span class="field-cat">${esc(p.type)}</span>
+          <h3>${esc(p.topic)}</h3>
         </article>`;
     }).join("");
   }
@@ -453,9 +433,9 @@
 
   $("#reviewGrid").innerHTML = REVIEWS.map((r) => `
     <article class="review-card reveal">
-      <span class="q">${icon("quote")}</span>
+      <span class="q grad">“</span>
       <blockquote>${esc(r.text)}</blockquote>
-      <div class="review-who"><strong>${esc(r.who)}</strong><span>${esc(r.course)}</span></div>
+      <p class="review-who">${esc(r.who)}</p>
     </article>`).join("");
 
   $("#faqList").innerHTML = FAQS.map((f, i) => `
@@ -480,11 +460,18 @@
   $("#topicChips").innerHTML = COURSES.map((c) => `
     <label class="topic-chip"><input type="checkbox" name="topics" value="${c.no}" /><span><b>${pad(c.no)}</b>${esc(c.title)}</span></label>`).join("");
 
+  const topicCount = $("#topicCount");
+  function updateTopicCount() {
+    const n = $$('input[name="topics"]:checked', form).length;
+    topicCount.textContent = n ? `${n}개 선택` : "";
+  }
+  $("#topicChips").addEventListener("change", updateTopicCount);
   function selectTopics(nos) {
     nos.forEach((no) => {
       const cb = $(`input[name="topics"][value="${no}"]`, form);
       if (cb) cb.checked = true;
     });
+    updateTopicCount();
   }
   function goContact() {
     $("#contact").scrollIntoView({ behavior: "smooth" });
