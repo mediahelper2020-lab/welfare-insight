@@ -482,6 +482,8 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .form-msg:empty { display: none; }
 .form-msg.err { color: #ff7a7a; }
+.form-msg.warn { color: var(--lime); font-weight: 600; line-height: 1.6; }
+.form-msg small { font-weight: 500; opacity: .8; }
 .form-msg.ok { color: var(--lime); }
 
 /* ---------- FOOTER ---------- */

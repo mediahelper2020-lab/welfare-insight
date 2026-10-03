@@ -606,6 +606,18 @@
     }
     if (form.elements._honey.value) return; // 자동 스팸 차단
 
+    const fail = (why) => {
+      formMsg.className = "form-msg err";
+      formMsg.innerHTML = `${why} <br /><button type="button" class="link-btn" id="mailFallback">메일 앱으로 보내기</button> 또는 ${CONTACT.phone}로 연락주세요.`;
+      $("#mailFallback").addEventListener("click", openMail);
+    };
+
+    // 내 컴퓨터에서 파일(index.html)을 바로 열면 FormSubmit이 전송을 막습니다.
+    if (location.protocol === "file:") {
+      fail("이 페이지를 파일로 직접 열면 메일 전송이 되지 않습니다. 홈페이지 주소(웹에 올린 사이트)에서는 정상 전송됩니다.");
+      return;
+    }
+
     const label = submitBtn.innerHTML;
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span> 보내는 중…';
@@ -624,12 +636,17 @@
         }),
       });
       const out = await res.json().catch(() => ({}));
-      if (!res.ok || String(out.success) !== "true") throw new Error(out.message || "failed");
-      showDone();
+      if (res.ok && String(out.success) === "true") { showDone(); return; }
+      const msg = String(out.message || "");
+      if (/activat/i.test(msg)) {
+        // 처음 한 번: 받는 메일 주소 인증이 필요한 상태
+        formMsg.className = "form-msg warn";
+        formMsg.innerHTML = `처음 사용하는 주소라 <b>${CONTACT.email}</b> 로 인증 메일(Activate Form)이 발송되었습니다.<br />메일함(스팸함 포함)에서 인증 버튼을 누른 뒤 다시 보내 주세요.`;
+        return;
+      }
+      fail(`전송에 실패했습니다.${msg ? ` <small>(${esc(msg)})</small>` : ` <small>(HTTP ${res.status})</small>`}`);
     } catch (err) {
-      formMsg.className = "form-msg err";
-      formMsg.innerHTML = `전송에 실패했습니다. <button type="button" class="link-btn" id="mailFallback">메일 앱으로 보내기</button> 또는 ${CONTACT.phone}로 연락주세요.`;
-      $("#mailFallback").addEventListener("click", openMail);
+      fail("전송에 실패했습니다. 인터넷 연결 또는 보안 프로그램(광고 차단 등)을 확인해 주세요.");
     } finally {
       submitBtn.disabled = false;
       submitBtn.innerHTML = label;
