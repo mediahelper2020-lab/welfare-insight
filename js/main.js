@@ -512,45 +512,8 @@
   form.addEventListener("input", (e) => { if (e.target.classList.contains("invalid") && e.target.value.trim()) e.target.classList.remove("invalid"); });
   form.elements.agree.addEventListener("change", (e) => e.target.closest(".agree").classList.toggle("invalid", !e.target.checked));
 
-  function payload() {
-    const f = form.elements;
-    const topics = $$('input[name="topics"]:checked', form).map((cb) => { const c = courseOf(cb.value); return `${pad(c.no)} ${c.title}`; });
-    return {
-      type: f.type.value, org: f.org.value, orgType: f.orgType.value, name: f.name.value,
-      phone: f.phone.value, email: f.email.value, target: f.target.value, date: f.date.value,
-      hours: f.hours.value, topics: topics.join(", "), message: f.message.value,
-      agree: f.agree.checked, website: f.website.value,
-    };
-  }
-
-  function openMail() {
-    const subject = `[복지인사이트 교육문의] ${form.elements.org.value.trim()} - ${form.elements.type.value}`;
-    const body = collect() + "\n\n— 복지인사이트 홈페이지에서 보낸 문의입니다.";
-    window.location.href = `mailto:${CONTACT.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  }
-
-  function showDone() {
-    const name = esc(form.elements.name.value.trim());
-    form.classList.add("is-done");
-    form.insertAdjacentHTML("beforeend", `
-      <div class="form-done" role="status">
-        <span class="fd-icon">${icon("check")}</span>
-        <h3>신청이 접수되었습니다</h3>
-        <p>${name}님, 확인 후 빠르게 연락드리겠습니다.<br />급한 문의는 <a href="tel:${CONTACT.phone}">${CONTACT.phone}</a></p>
-        <button type="button" class="btn btn-line" id="formAgain">새 신청 작성</button>
-      </div>`);
-    $("#formAgain").addEventListener("click", () => {
-      form.reset(); updateTopicCount();
-      form.classList.remove("is-done");
-      $(".form-done", form).remove();
-      formMsg.textContent = "";
-    });
-  }
-
-  const submitBtn = $('button[type="submit"]', form);
-  form.addEventListener("submit", async (e) => {
+  form.addEventListener("submit", (e) => {
     e.preventDefault();
-    if (submitBtn.disabled) return;
     if (!validate()) {
       formMsg.className = "form-msg err";
       formMsg.textContent = "필수 항목(기관명·담당자·연락처)과 개인정보 동의를 확인해 주세요.";
@@ -558,42 +521,12 @@
       if (first) (first.matches("input,select,textarea") ? first : $("input", first)).focus();
       return;
     }
-
-    // 자동 저장 주소가 없으면 이메일 창으로
-    if (!CONTACT.formEndpoint) {
-      openMail();
-      formMsg.className = "form-msg ok";
-      formMsg.textContent = "이메일 창이 열렸습니다. 내용을 확인하고 ‘보내기’를 눌러주세요.";
-      return;
-    }
-
-    const label = submitBtn.innerHTML;
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span> 접수 중…';
-    formMsg.textContent = "";
-    try {
-      // text/plain 으로 보내면 브라우저 사전요청(CORS preflight) 없이 Apps Script에 전달됩니다.
-      const res = await fetch(CONTACT.formEndpoint, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(payload()),
-      });
-      const out = await res.json();
-      if (!out.ok) throw new Error(out.error || "failed");
-      showDone();
-    } catch (err) {
-      formMsg.className = "form-msg err";
-      formMsg.innerHTML = `전송에 실패했습니다. <button type="button" class="link-btn" id="mailFallback">이메일로 보내기</button> 또는 ${CONTACT.phone}로 연락주세요.`;
-      $("#mailFallback").addEventListener("click", openMail);
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = label;
-    }
+    const subject = `[복지인사이트 교육문의] ${form.elements.org.value.trim()} - ${form.elements.type.value}`;
+    const body = collect() + "\n\n— 복지인사이트 홈페이지에서 보낸 문의입니다.";
+    window.location.href = `mailto:${CONTACT.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    formMsg.className = "form-msg ok";
+    formMsg.textContent = "이메일 창이 열렸습니다. 내용을 확인하고 ‘보내기’를 눌러주세요.";
   });
-
-  if (CONTACT.formEndpoint) {
-    $(".form-note", form).innerHTML = `신청 내용은 담당자에게 바로 전달됩니다 · <button type="button" class="link-btn" id="copyForm">내용 복사</button>`;
-  }
 
   $("#copyForm").addEventListener("click", async () => {
     const text = collect();

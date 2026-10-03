@@ -9,10 +9,6 @@ const CONTACT = {
   email: "mediahelper2020@gmail.com",
   blog: "https://blog.naver.com/mediahelper",
   cafe: "https://cafe.naver.com/mediahelper",
-  /* 교육신청 자동 저장(구글 시트) + 문자 알림 주소.
-     apps-script/README.md 대로 배포한 뒤 웹앱 URL(…/exec)을 붙여 넣으세요.
-     비워 두면 기존처럼 이메일 창이 열립니다. */
-  formEndpoint: "",
 };
 
 const TRACKS = [

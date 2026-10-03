@@ -457,15 +457,6 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .agree.invalid { color: #ff7a7a; }
 .form-note { font-size: 13.5px; color: var(--dim); text-align: center; }
 .form-msg { font-size: 14.5px; font-weight: 700; text-align: center; }
-.hp { position: absolute !important; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
-.spinner { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; animation: spin .8s linear infinite; }
-.btn:disabled { opacity: .75; cursor: progress; }
-.contact-form.is-done > *:not(.form-done) { visibility: hidden; }
-.form-done { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 32px; animation: fade .4s; }
-.form-done h3 { margin-top: 18px; font-size: 26px; font-weight: 900; letter-spacing: -0.04em; }
-.form-done p { margin: 10px 0 26px; color: var(--muted); }
-.form-done a { color: var(--accent); font-weight: 700; }
-.fd-icon { display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%; background: var(--grad); color: var(--ink); font-size: 34px; box-shadow: 0 0 50px -6px rgba(255,138,31,.8); }
 .form-msg:empty { display: none; }
 .form-msg.err { color: #ff7a7a; }
 .form-msg.ok { color: var(--lime); }
@@ -705,4 +696,3 @@ body.modal-open { overflow: hidden; }
   .sy-track { break-inside: avoid-page; }
   .sy-table tr { break-inside: avoid; }
 }
-@keyframes spin { to { transform: rotate(360deg); } }
