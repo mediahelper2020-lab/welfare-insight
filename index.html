@@ -79,26 +79,31 @@
 
 <!-- ============ HERO ============ -->
 <section class="hero">
-  <div class="hero-glow" aria-hidden="true"></div>
+  <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="hero-gridlines" aria-hidden="true"></div>
   <div class="container hero-grid">
     <div class="hero-copy">
       <p class="tag tag-dark"><svg><use href="#i-sparkle"/></svg>사람중심 사회복지 AX</p>
-      <h1>현장의 경험에<br /><span class="grad">AI</span>를 더하다</h1>
+      <h1 class="split"><span class="line"><span>현장의 경험에</span></span><span class="line"><span><span class="grad">AI</span>를 더하다</span></span></h1>
       <p class="hero-lead">사회복지 현장을 이해하는 AI 실무교육</p>
       <div class="hero-actions">
-        <a href="#courses" class="btn btn-accent btn-lg">전문교육 과정 보기 <svg><use href="#i-arrow"/></svg></a>
+        <a href="#courses" class="btn btn-accent btn-lg magnetic">전문교육 과정 보기 <svg><use href="#i-arrow"/></svg></a>
         <a href="#custom" class="btn btn-glass btn-lg">맞춤교육 문의</a>
+      </div>
+      <div class="hero-proof">
+        <div class="avatars" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        <p><b>25,031명</b>의 사회복지사가 함께했습니다</p>
       </div>
     </div>
 
-    <div class="hero-visual" aria-hidden="true">
-      <div class="orb">
-        <img src="assets/img/logo.png" alt="" />
+    <div class="hero-visual">
+      <div class="logo3d" id="logo3d" role="img" aria-label="복지인사이트 3D 로고">
+        <img class="logo3d-fallback" src="assets/img/logo-3d.png" alt="" />
       </div>
-      <span class="chip chip-1"><b>20</b> 전문과정</span>
-      <span class="chip chip-2"><svg><use href="#i-tool"/></svg>실습 중심</span>
-      <span class="chip chip-3"><svg><use href="#i-shield"/></svg>개인정보 보호</span>
-      <span class="chip chip-4"><svg><use href="#i-layers"/></svg>기관 맞춤</span>
+      <span class="chip chip-1" aria-hidden="true"><b>20</b> 전문과정</span>
+      <span class="chip chip-2" aria-hidden="true"><svg><use href="#i-tool"/></svg>실습 중심</span>
+      <span class="chip chip-3" aria-hidden="true"><svg><use href="#i-shield"/></svg>개인정보 보호</span>
+      <span class="chip chip-4" aria-hidden="true"><svg><use href="#i-layers"/></svg>기관 맞춤</span>
     </div>
   </div>
 
@@ -106,6 +111,10 @@
     <div class="marquee-track">
       <span>사회복지 특화</span><i>✦</i><span>실습 중심</span><i>✦</i><span>기관 맞춤형</span><i>✦</i><span>개인정보 보호</span><i>✦</i><span>현장 적용</span><i>✦</i><span>바이브코딩</span><i>✦</i>
       <span>사회복지 특화</span><i>✦</i><span>실습 중심</span><i>✦</i><span>기관 맞춤형</span><i>✦</i><span>개인정보 보호</span><i>✦</i><span>현장 적용</span><i>✦</i><span>바이브코딩</span><i>✦</i>
+    </div>
+    <div class="marquee-track reverse outline">
+      <span>AI 리터러시</span><i>✦</i><span>ChatGPT</span><i>✦</i><span>Gemini</span><i>✦</i><span>Claude</span><i>✦</i><span>NotebookLM</span><i>✦</i><span>사례관리</span><i>✦</i><span>사업계획서</span><i>✦</i>
+      <span>AI 리터러시</span><i>✦</i><span>ChatGPT</span><i>✦</i><span>Gemini</span><i>✦</i><span>Claude</span><i>✦</i><span>NotebookLM</span><i>✦</i><span>사례관리</span><i>✦</i><span>사업계획서</span><i>✦</i>
     </div>
   </div>
 </section>
@@ -174,7 +183,7 @@
 </section>
 
 <!-- ============ EDUCATION ============ -->
-<section class="section section-soft" id="courses">
+<section class="section" id="courses">
   <div class="container">
     <div class="head head-row reveal">
       <div>
@@ -260,12 +269,12 @@
 </section>
 
 <!-- ============ INSTRUCTOR ============ -->
-<section class="section section-soft" id="instructor">
+<section class="section" id="instructor">
   <div class="container instructor-grid">
     <div class="instructor-photo reveal">
       <!-- 강사 사진: assets/img/instructor.jpg 를 넣고 아래 img 주석을 해제하세요 -->
       <!-- <img src="assets/img/instructor.jpg" alt="복지인사이트 대표 이창희" /> -->
-      <div class="photo-placeholder"><img src="assets/img/logo.png" alt="" /></div>
+      <div class="photo-placeholder"><img src="assets/img/logo-3d.png" alt="" /></div>
     </div>
     <div class="instructor-copy reveal">
       <p class="tag">INSTRUCTOR</p>
@@ -337,7 +346,7 @@
 </section>
 
 <!-- ============ PROCESS ============ -->
-<section class="section section-soft" id="process">
+<section class="section" id="process">
   <div class="container">
     <div class="head center reveal">
       <p class="tag">PROCESS</p>
@@ -449,5 +458,20 @@
 
 <script src="js/data.js"></script>
 <script src="js/main.js"></script>
+<script src="js/logo-path.js"></script>
+<script src="js/logo3d.js"></script>
+<script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  } }
+</script>
+<script type="module">
+  import * as THREE from "three";
+  import { SVGLoader } from "three/addons/loaders/SVGLoader.js";
+  import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+  import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+  window.initLogo3D({ THREE, SVGLoader, RoomEnvironment, RoundedBoxGeometry });
+</script>
 </body>
 </html>

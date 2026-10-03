@@ -540,4 +540,48 @@
   });
 
   $("#year").textContent = new Date().getFullYear();
+
+  /* =========================================================
+     MOTION — 스포트라이트 · 카드 기울기 · 마그네틱 버튼 · 제목 등장
+     ========================================================= */
+  const fine = matchMedia("(hover: hover) and (pointer: fine)").matches;
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const SPOT = ".quick-card, .bento-card, .course-card, .tool-card, .review-card, .material-card, .process li, .faq-item, .practice-step, .kpi li, .builder";
+
+  if (fine) {
+    document.addEventListener("pointermove", (e) => {
+      const card = e.target.closest(SPOT);
+      if (!card) return;
+      const r = card.getBoundingClientRect();
+      const x = e.clientX - r.left, y = e.clientY - r.top;
+      card.style.setProperty("--mx", `${x}px`);
+      card.style.setProperty("--my", `${y}px`);
+      if (!still && card.classList.contains("course-card")) {
+        const rx = ((y / r.height) - 0.5) * -8, ry = ((x / r.width) - 0.5) * 10;
+        card.style.transform = `translateY(-6px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+      }
+    }, { passive: true });
+    document.addEventListener("pointerout", (e) => {
+      const card = e.target.closest(".course-card");
+      if (card && !card.contains(e.relatedTarget)) card.style.transform = "";
+    });
+
+    if (!still) $$(".magnetic").forEach((btn) => {
+      btn.addEventListener("pointermove", (e) => {
+        const r = btn.getBoundingClientRect();
+        btn.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * 0.25}px, ${(e.clientY - r.top - r.height / 2) * 0.35}px)`;
+      });
+      btn.addEventListener("pointerleave", () => { btn.style.transform = ""; });
+    });
+  }
+
+  // 섹션 제목을 줄 단위로 감싸 아래에서 올라오게
+  const splitObs = new IntersectionObserver((entries) => {
+    entries.forEach((en) => { if (en.isIntersecting) { en.target.classList.add("in"); splitObs.unobserve(en.target); } });
+  }, { threshold: 0.3 });
+  $$(".head h2, .custom-copy h2, .contact-copy h2").forEach((h) => {
+    h.innerHTML = h.innerHTML.split(/<br\s*\/?>/i).map((part) => `<span class="line"><span>${part.trim()}</span></span>`).join("");
+    h.classList.add("split");
+    splitObs.observe(h);
+  });
 })();
