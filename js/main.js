@@ -350,40 +350,47 @@
       <h3>${esc(s.title)}</h3>
     </li>`).join("");
 
-  const FIELD_STYLE = {
-    "보수교육": ["#2a2d12", "#5d6b1e", "book"],
-    "사회복지관": ["#3d4220", "#7d8b33", "pin"],
-    "장기요양": ["#4a3a1a", "#b0772c", "hands"],
-    "장애인복지": ["#1f3a35", "#3f7d6f", "user"],
-    "아동복지": ["#40291c", "#d0793a", "star"],
-    "정신건강": ["#262d44", "#5869a3", "shield"],
-    "사회서비스": ["#30311c", "#8a8f4a", "layers"],
+  /* =========================================================
+     교육 현장 기록 — 네이버 블로그 '교육현장' 카테고리 자동 연동 (/api/blog)
+     ========================================================= */
+  const blogGrid = $("#blogGrid");
+  const BLOG_URL = CONTACT.blog;
+  const imgSrc = (u) => (/pstatic\.net/.test(u) ? `/api/img?u=${encodeURIComponent(u)}` : u);
+  const fmtDate = (iso) => {
+    if (!iso) return "";
+    const d = new Date(iso);
+    return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
   };
-  const fieldCats = ["전체", ...Object.keys(FIELD_STYLE)];
-  const fieldFilters = $("#fieldFilters");
-  fieldFilters.innerHTML = fieldCats.map((c, i) => `<button type="button" role="tab" class="filter-btn" data-cat="${esc(c)}" aria-selected="${i === 0}">${esc(c === "보수교육" ? "사회복지사 보수교육" : c === "사회서비스" ? "사회서비스 제공기관" : c)}</button>`).join("");
-  fieldFilters.addEventListener("click", (e) => {
-    const b = e.target.closest(".filter-btn");
-    if (!b) return;
-    $$(".filter-btn", fieldFilters).forEach((x) => x.setAttribute("aria-selected", String(x === b)));
-    renderField(b.dataset.cat);
-  });
-  function renderField(cat = "전체") {
-    const list = PORTFOLIO.filter((p) => cat === "전체" || p.cat === cat);
-    $("#fieldGrid").innerHTML = list.map((p, i) => {
-      const [c1, c2, ic] = FIELD_STYLE[p.cat] || ["#2a2d12", "#5d6b1e", "image"];
-      const thumb = p.image
-        ? `<img src="${esc(p.image)}" alt="${esc(p.topic)} 교육 현장" loading="lazy" />`
-        : `<span class="ph">${icon(ic)}</span>`;
-      return `
-        <article class="field-card" style="animation-delay:${i * 50}ms">
-          <div class="field-thumb" style="background:linear-gradient(135deg, ${c1}, ${c2})">${thumb}</div>
-          <span class="field-cat">${esc(p.type)}</span>
-          <h3>${esc(p.topic)}</h3>
-        </article>`;
-    }).join("");
+  function renderBlog(items) {
+    blogGrid.innerHTML = items.map((p, i) => `
+      <a class="blog-card" href="${esc(p.link)}" target="_blank" rel="noopener" style="animation-delay:${i * 60}ms">
+        <div class="blog-thumb">
+          ${p.image ? `<img src="${esc(imgSrc(p.image))}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${esc(p.image)}'" />` : `<span class="ph">${icon("image")}</span>`}
+          <span class="blog-badge">교육현장</span>
+        </div>
+        <div class="blog-body">
+          <time>${esc(fmtDate(p.date))}</time>
+          <h3>${esc(p.title)}</h3>
+          ${p.summary ? `<p>${esc(p.summary)}</p>` : ""}
+          <span class="blog-more">기록 보기 ${icon("arrow-up-right")}</span>
+        </div>
+      </a>`).join("");
   }
-  renderField();
+  function renderBlogFallback() {
+    blogGrid.innerHTML = `
+      <a class="blog-empty" href="${esc(BLOG_URL)}" target="_blank" rel="noopener">
+        ${icon("blog")}
+        <strong>블로그에서 최근 교육 현장 기록 보기</strong>
+        <span>${esc(BLOG_URL.replace("https://", ""))} ${icon("arrow-up-right")}</span>
+      </a>`;
+  }
+  if (blogGrid) {
+    blogGrid.innerHTML = Array.from({ length: 6 }, () => `<div class="blog-card skeleton"><div class="blog-thumb"></div><div class="blog-body"><i></i><i></i><i></i></div></div>`).join("");
+    fetch("/api/blog")
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
+      .then((data) => (data.ok && data.items && data.items.length ? renderBlog(data.items) : renderBlogFallback()))
+      .catch(renderBlogFallback);
+  }
 
   $("#reviewGrid").innerHTML = REVIEWS.map((r) => `
     <article class="review-card reveal">

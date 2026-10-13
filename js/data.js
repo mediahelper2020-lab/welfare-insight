@@ -300,20 +300,6 @@ const PRACTICE_STEPS = [
   { title: "기관 업무 적용", desc: "내일부터 쓸 나만의 활용 계획 수립", icon: "check" },
 ];
 
-/* 교육 현장 — image 값에 사진 경로를 넣으면 사진으로 교체됩니다.
-   예) image: "assets/img/field/01.jpg" */
-const PORTFOLIO = [
-  { cat: "보수교육", topic: "생성형 AI로 시작하는 사회복지 업무혁신", type: "사회복지사 보수교육", image: "" },
-  { cat: "사회복지관", topic: "AI 활용 사업계획서·프로포절 작성 실습", type: "사회복지관", image: "" },
-  { cat: "장기요양", topic: "장기요양 기록업무와 상담일지 AI 활용", type: "장기요양기관", image: "" },
-  { cat: "장애인복지", topic: "쉬운 정보 만들기와 개별지원계획 AI 실습", type: "장애인복지", image: "" },
-  { cat: "아동복지", topic: "아동 프로그램 기획과 가정통신문 작성", type: "아동복지", image: "" },
-  { cat: "정신건강", topic: "민감정보 보호와 회복 프로그램 자료 제작", type: "정신건강", image: "" },
-  { cat: "사회서비스", topic: "사회서비스 제공기관 실무자 ChatGPT 활용", type: "사회서비스 제공기관", image: "" },
-  { cat: "사회복지관", topic: "디자이너 없이 만드는 기관 홍보콘텐츠", type: "사회복지관", image: "" },
-  { cat: "보수교육", topic: "코딩 몰라도 OK, AI 바이브코딩 실무", type: "사회복지사 보수교육", image: "" },
-];
-
 /* 교육 후기 — 아래는 예시 문구입니다. 실제 교육 만족도 조사·후기 원문으로 교체해 주세요. */
 const REVIEWS = [
   { text: "막연하게 어렵게 느껴졌던 AI를 실제 업무에 어떻게 활용해야 하는지 알게 되었습니다.", who: "사회복지관 실무자", course: "생성형 AI 통합 기초과정" },

@@ -386,6 +386,31 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .field-cat { position: absolute; z-index: 1; left: 18px; top: 18px; padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,.14); backdrop-filter: blur(10px); box-shadow: inset 0 0 0 1px rgba(255,255,255,.2); font-size: 12.5px; font-weight: 700; }
 .field-card h3 { position: absolute; z-index: 1; left: 22px; right: 22px; bottom: 20px; font-size: 19px; font-weight: 800; line-height: 1.35; letter-spacing: -0.03em; }
 
+/* ---------- BLOG (교육 현장 기록) ---------- */
+.blog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.blog-card { display: flex; flex-direction: column; border-radius: var(--radius); overflow: hidden; background: var(--glass); border: 1px solid var(--stroke); transition: transform .4s cubic-bezier(.2,.7,.2,1), border-color .3s; animation: cardIn .6s both; }
+.blog-card:hover { transform: translateY(-6px); border-color: rgba(255,138,31,.5); }
+.blog-thumb { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: linear-gradient(135deg, #2a2d12, #5d6b1e); display: grid; place-items: center; }
+.blog-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .8s cubic-bezier(.2,.7,.2,1); }
+.blog-card:hover .blog-thumb img { transform: scale(1.06); }
+.blog-thumb .ph { font-size: 48px; opacity: .3; color: var(--cream); }
+.blog-badge { position: absolute; left: 14px; top: 14px; padding: 5px 11px; border-radius: 999px; background: rgba(20,22,10,.6); backdrop-filter: blur(8px); color: var(--cream); font-size: 12px; font-weight: 800; box-shadow: inset 0 0 0 1px rgba(255,255,255,.2); }
+.blog-body { display: flex; flex-direction: column; gap: 6px; padding: 20px 22px 22px; flex: 1; }
+.blog-body time { font-size: 13px; font-weight: 700; color: var(--accent); }
+.blog-body h3 { font-size: 18px; font-weight: 800; line-height: 1.4; letter-spacing: -0.03em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.blog-body p { font-size: 14px; color: var(--muted); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.blog-more { margin-top: auto; padding-top: 10px; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: var(--cream); }
+.blog-card.skeleton { pointer-events: none; }
+.blog-card.skeleton .blog-thumb { background: rgba(255,255,255,.04); }
+.blog-card.skeleton i { display: block; height: 12px; border-radius: 6px; background: rgba(255,255,255,.06); animation: shimmer 1.4s ease-in-out infinite; }
+.blog-card.skeleton i:nth-child(1) { width: 30%; } .blog-card.skeleton i:nth-child(2) { width: 90%; height: 16px; } .blog-card.skeleton i:nth-child(3) { width: 70%; }
+@keyframes shimmer { 50% { opacity: .4; } }
+.blog-empty { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 56px 24px; border-radius: var(--radius); background: var(--glass); border: 1px dashed var(--stroke-2); text-align: center; transition: border-color .3s; }
+.blog-empty:hover { border-color: var(--accent); }
+.blog-empty > svg { font-size: 34px; color: var(--accent); }
+.blog-empty strong { font-size: 19px; font-weight: 800; }
+.blog-empty span { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 14px; }
+
 /* ---------- REVIEWS ---------- */
 .review-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .review-card { padding: 38px 32px; display: flex; flex-direction: column; }
@@ -636,6 +661,7 @@ body.modal-open { overflow: hidden; }
 }
 
 @media (max-width: 1024px) {
+  .blog-grid { grid-template-columns: 1fr 1fr; }
   .apply-info { grid-template-columns: 1fr 1fr; }
   .info-request { grid-column: 1 / -1; }
   .site-header > .header-inner { margin-top: 8px; }
@@ -670,6 +696,8 @@ body.modal-open { overflow: hidden; }
 }
 
 @media (max-width: 720px) {
+  .blog-grid { grid-template-columns: 1fr; gap: 12px; }
+  .blog-thumb { aspect-ratio: 16 / 9; }
   .topbar { height: 34px; font-size: 12.5px; }
   .topbar-inner { justify-content: center; gap: 16px; }
   .tb-label { display: none; }

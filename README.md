@@ -14,6 +14,8 @@ GitHub Pages·Netlify 등에 그대로 올리면 됩니다.
 | `js/data.js` | **콘텐츠 데이터** — 20개 교육과정, 맞춤교육 규칙, 교육현장, 후기, FAQ, 연락처 |
 | `js/main.js` | 탭·검색, 과정 상세 팝업, 2027 강의계획서(인쇄/PDF), 맞춤교육 미리보기, 문의폼 |
 | `js/logo3d.js`, `js/logo-path.js` | 히어로 3D 로고 (Three.js, 로고 벡터를 입체로 돌출·광택 렌더링, 마우스에 반응) |
+| `api/blog.js` | 네이버 블로그 '교육현장' 카테고리 최신 글 가져오기 (Vercel 서버 기능, 10분 캐시) |
+| `api/img.js` | 네이버 블로그 썸네일 이미지 중계 |
 | `assets/img/logo.png` | 복지인사이트 로고 원본 |
 | `assets/img/logo-mark.svg` | 로고 벡터 (투명 배경) |
 | `assets/img/logo-3d.png` | 3D 로고 정지 이미지 (WebGL을 쓸 수 없을 때 대체 이미지, 강사 소개 영역) |
@@ -21,7 +23,7 @@ GitHub Pages·Netlify 등에 그대로 올리면 됩니다.
 ## 내용 수정 방법
 
 - **교육과정 내용**: `js/data.js`의 `COURSES` 배열에서 교육대상·시간·주요내용·실습·결과물을 수정합니다.
-- **교육현장 사진**: 사진을 `assets/img/field/`에 넣고 `PORTFOLIO` 항목의 `image` 값에 경로를 적습니다.
+- **교육현장 기록**: 네이버 블로그(blog.naver.com/mediahelper)의 '교육현장' 카테고리에 글을 올리면 10분 안에 홈페이지 카드로 자동 표시됩니다. 카테고리 이름을 바꾸면 Vercel 환경변수 `NAVER_BLOG_CATEGORY`에 새 이름을 넣어 주세요. (Vercel에 배포된 사이트에서만 동작하며, 파일로 열면 '블로그에서 보기' 안내가 나옵니다.)
 - **강사 사진**: `assets/img/instructor.jpg`를 넣고 `index.html`의 강사 소개 영역 주석을 해제합니다.
 - **교육 후기**: `REVIEWS`는 예시 문구입니다. 실제 후기 원문으로 교체해 주세요.
 
