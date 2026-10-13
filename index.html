@@ -54,22 +54,28 @@
 
 <!-- ============ HEADER ============ -->
 <header class="site-header" id="top">
+  <div class="topbar">
+    <div class="container topbar-inner">
+      <span class="tb-label">교육문의</span>
+      <a href="tel:070-8019-3355"><svg><use href="#i-phone"/></svg>전화 <b>070-8019-3355</b></a>
+      <a href="mailto:mediahelper2020@gmail.com"><svg><use href="#i-mail"/></svg><span class="tb-hide">이메일 문의</span> <b>mediahelper2020@gmail.com</b></a>
+    </div>
+  </div>
   <div class="container header-inner">
     <a href="#top" class="brand" aria-label="복지인사이트 홈">
       <img src="assets/img/logo.png" alt="" width="36" height="36" />
       <strong>복지인사이트</strong>
     </a>
     <nav class="main-nav" id="mainNav" aria-label="주요 메뉴">
+      <a href="#contact">교육신청</a>
       <a href="#courses">전문교육</a>
-      <a href="#custom">맞춤교육</a>
-      <a href="#field">교육현장</a>
       <a href="#instructor">강사소개</a>
+      <a href="#field">교육현장</a>
       <a href="#reviews">교육후기</a>
       <a href="#materials">강의자료</a>
-      <a href="#contact">문의하기</a>
-      <a href="#contact" class="btn btn-accent nav-cta">교육 문의</a>
+      <a href="#contact" class="btn btn-accent nav-cta">교육신청</a>
     </nav>
-    <a href="#contact" class="btn btn-accent btn-sm header-cta">교육 문의</a>
+    <a href="#contact" class="btn btn-accent btn-sm header-cta">교육신청</a>
     <button class="nav-toggle" id="navToggle" aria-label="메뉴 열기" aria-expanded="false" aria-controls="mainNav">
       <span></span><span></span>
     </button>
@@ -89,7 +95,7 @@
       <p class="hero-lead">사회복지 현장을 이해하는 AI 실무교육</p>
       <div class="hero-actions">
         <a href="#courses" class="btn btn-accent btn-lg magnetic">전문교육 과정 보기 <svg><use href="#i-arrow"/></svg></a>
-        <a href="#custom" class="btn btn-glass btn-lg">맞춤교육 문의</a>
+        <a href="#contact" class="btn btn-glass btn-lg">교육신청하기</a>
       </div>
       <div class="hero-proof">
         <div class="avatars" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -130,10 +136,10 @@
         <small>분야별 20개 과정</small>
         <svg class="qc-go"><use href="#i-arrow-up-right"/></svg>
       </a>
-      <a href="#custom" class="quick-card quick-accent">
+      <a href="#contact" class="quick-card quick-accent">
         <svg class="qc-icon"><use href="#i-chat"/></svg>
-        <strong>기관 맞춤교육</strong>
-        <small>우리 기관에 맞게 상담</small>
+        <strong>교육신청</strong>
+        <small>바로 신청하기 · 강의의뢰서</small>
         <svg class="qc-go"><use href="#i-arrow-up-right"/></svg>
       </a>
       <button type="button" class="quick-card" data-open-syllabus>
@@ -160,6 +166,92 @@
     </ul>
   </div>
 </section>
+
+<!-- ============ 교육신청 (문의 · 강의의뢰서 · 바로 신청하기) ============ -->
+<section class="apply" id="contact">
+  <div class="hero-glow" aria-hidden="true"></div>
+  <div class="container">
+    <div class="apply-head">
+      <p class="tag tag-dark">APPLY</p>
+      <h2>교육 문의 · 신청</h2>
+    </div>
+    <div class="apply-info">
+      <a class="info-card" href="tel:070-8019-3355">
+        <span class="ic"><svg><use href="#i-phone"/></svg></span>
+        <small>교육문의 전화</small>
+        <strong>070-8019-3355</strong>
+      </a>
+      <a class="info-card" href="mailto:mediahelper2020@gmail.com">
+        <span class="ic"><svg><use href="#i-mail"/></svg></span>
+        <small>이메일 문의</small>
+        <strong class="email">mediahelper2020@gmail.com</strong>
+      </a>
+      <div class="info-card info-request">
+        <span class="ic"><svg><use href="#i-file"/></svg></span>
+        <small>공문·의뢰서로 요청하시나요?</small>
+        <strong>강의의뢰서 메일 작성</strong>
+        <div class="ir-actions">
+          <a class="btn btn-accent btn-sm" id="requestMail" href="mailto:mediahelper2020@gmail.com?subject=%5B%EA%B0%95%EC%9D%98%EC%9D%98%EB%A2%B0%EC%84%9C%5D">메일 앱으로 작성</a>
+          <a class="btn btn-glass btn-sm" id="requestGmail" href="https://mail.google.com/mail/?view=cm&amp;to=mediahelper2020@gmail.com" target="_blank" rel="noopener">Gmail로 작성</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="apply-form">
+      <div class="apply-title">
+        <h3>바로 신청하기</h3>
+        <p>1분이면 충분해요. 신청하시면 담당자가 확인 후 연락드립니다.</p>
+      </div>
+      <form class="contact-form" id="contactForm" novalidate>
+      <input type="hidden" name="type" value="교육신청" />
+      <input type="hidden" name="orgType" value="" />
+      <label class="hp" aria-hidden="true">홈페이지 <input name="_honey" tabindex="-1" autocomplete="off" /></label>
+      <div class="form-row two">
+        <input name="org" required placeholder="기관명 *" aria-label="기관명 (필수)" />
+        <input name="name" required placeholder="담당자 *" aria-label="담당자 (필수)" />
+      </div>
+      <div class="form-row two">
+        <input name="phone" type="tel" inputmode="numeric" autocomplete="tel" maxlength="13" required placeholder="연락처 * 010-0000-0000" aria-label="연락처 (필수)" />
+        <input name="email" type="email" placeholder="이메일" aria-label="이메일" />
+      </div>
+      <input name="target" placeholder="교육대상·인원 (예: 사회복지사 25명)" aria-label="교육대상·인원" />
+      <div class="form-row two">
+        <select name="hours" aria-label="1회 교육시간">
+          <option value="">1회 교육시간</option>
+          <option value="1~2시간 (기조강연)">1~2시간 (기조강연)</option>
+          <option>3시간</option><option>4시간</option><option>5시간</option><option>6시간</option><option>7시간</option><option>8시간</option>
+          <option>협의</option>
+        </select>
+        <select name="sessions" aria-label="회차">
+          <option value="">회차</option>
+          <option>1회</option><option>2회</option><option>3회</option><option>4회</option><option>5회</option>
+          <option>6회</option><option>7회</option><option>8회</option><option>9회</option><option>10회</option>
+          <option>협의</option>
+        </select>
+      </div>
+      <p class="hours-hint" id="hoursHint" aria-live="polite"></p>
+      <fieldset class="date-field">
+        <legend><svg><use href="#i-calendar"/></svg>희망 교육일 <small>달력에서 선택 · 회차를 고르면 회차별로 선택</small></legend>
+        <div class="date-list" id="dateList"></div>
+      </fieldset>
+      <div class="topic-custom">
+        <label for="customTopic"><svg><use href="#i-sparkle"/></svg>희망 교육 주제 <small>직접 입력</small></label>
+        <input id="customTopic" name="customTopic" placeholder="예: 사례관리 기록에 AI 활용, 직원 대상 ChatGPT 입문" />
+      </div>
+      <details class="topic-field">
+        <summary>또는 20개 과정에서 선택 <span id="topicCount"></span></summary>
+        <div class="topic-chips" id="topicChips"></div>
+      </details>
+      <textarea name="message" rows="3" placeholder="문의내용" aria-label="문의내용"></textarea>
+      <label class="agree"><input type="checkbox" name="agree" required /> 개인정보 수집·이용 동의 (문의 응대용)</label>
+      <button type="submit" class="btn btn-accent btn-lg btn-block">교육신청 <svg><use href="#i-arrow"/></svg></button>
+      <p class="form-note">신청 내용은 담당자에게 바로 전달됩니다 · <button type="button" class="link-btn" id="copyForm">내용 복사</button></p>
+      <p class="form-msg" id="formMsg" role="status"></p>
+    </form>
+    </div>
+  </div>
+</section>
+
 
 <!-- ============ WHY ============ -->
 <section class="section" id="why">
@@ -199,47 +291,11 @@
 
     <div class="track-tabs reveal" role="tablist" aria-label="교육 분야" id="trackTabs"></div>
     <div class="course-grid" id="courseGrid" aria-live="polite"></div>
-    <p class="course-empty" id="courseEmpty" hidden>검색 결과가 없어요. <a href="#contact">맞춤교육으로 문의하기</a></p>
+    <p class="course-empty" id="courseEmpty" hidden>검색 결과가 없어요. <a href="#contact">교육신청에서 원하는 주제를 적어 주세요</a></p>
   </div>
 </section>
 
-<!-- ============ CUSTOM ============ -->
-<section class="section" id="custom">
-  <div class="container custom-grid">
-    <div class="custom-copy reveal">
-      <p class="tag">CUSTOM</p>
-      <h2>우리 기관에<br />필요한 것만</h2>
-      <p class="sub">기관 · 시간 · 수준을 고르면<br />추천 구성을 보여드려요.</p>
-      <div class="example-pills">
-        <button type="button" class="example-chip" data-example="center,6,beginner">사회복지관 · 6h · 초급</button>
-        <button type="button" class="example-chip" data-example="ltc,3,practitioner">장기요양 · 3h · 실무자</button>
-        <button type="button" class="example-chip" data-example="manager,3,practitioner">관리자 · 3h</button>
-        <button type="button" class="example-chip" data-example="center,4,practitioner,3">사회복지관 · 4h × 3회</button>
-      </div>
-    </div>
 
-    <div class="builder reveal" id="builder">
-      <div class="builder-step">
-        <p class="builder-label">기관</p>
-        <div class="choice-group" data-group="org"></div>
-      </div>
-      <div class="builder-step">
-        <p class="builder-label">시간</p>
-        <div class="choice-group" data-group="hours"></div>
-      </div>
-      <div class="builder-step">
-        <p class="builder-label">회차</p>
-        <div class="choice-group" data-group="sessions"></div>
-      </div>
-      <div class="builder-step">
-        <p class="builder-label">수준</p>
-        <div class="choice-group" data-group="level"></div>
-      </div>
-      <div class="builder-result" id="builderResult" aria-live="polite"></div>
-      <a href="#contact" class="btn btn-accent btn-block" id="builderCta">이 구성으로 상담하기 <svg><use href="#i-arrow"/></svg></a>
-    </div>
-  </div>
-</section>
 
 <!-- ============ PRACTICE ============ -->
 <section class="section section-dark" id="practice">
@@ -295,9 +351,9 @@
       <div class="badge-row">
         <span>사회복지사 1급</span><span>인공지능데이터전문가 1급</span><span>청소년지도사 2급</span><span>대한민국인재상</span>
       </div>
+      <ul class="career-list" id="careerList"></ul>
       <div class="btn-row">
-        <button type="button" class="btn btn-dark" data-open-profile>상세 프로필</button>
-        <button type="button" class="btn btn-line" data-open-syllabus>강의계획서</button>
+        <button type="button" class="btn btn-line" data-open-syllabus>2027 강의계획서 보기</button>
       </div>
     </div>
   </div>
@@ -381,67 +437,19 @@
 </section>
 
 <!-- ============ CONTACT ============ -->
-<section class="final-cta" id="contact">
+<!-- ============ END CTA ============ -->
+<section class="end-cta">
   <div class="hero-glow" aria-hidden="true"></div>
-  <div class="container contact-grid">
-    <div class="contact-copy">
-      <p class="tag tag-dark">CONTACT</p>
-      <h2>어떤 AI 교육이<br />필요할까요?</h2>
-      <p class="sub">대상 · 일정 · 시간 · 주제만 알려주세요.</p>
-      <ul class="contact-list">
-        <li><a href="tel:070-8019-3355"><svg><use href="#i-phone"/></svg>070-8019-3355</a></li>
-        <li><a href="mailto:mediahelper2020@gmail.com"><svg><use href="#i-mail"/></svg>mediahelper2020@gmail.com</a></li>
-        <li><a href="https://blog.naver.com/mediahelper" target="_blank" rel="noopener"><svg><use href="#i-blog"/></svg>블로그</a></li>
-        <li><a href="https://cafe.naver.com/mediahelper" target="_blank" rel="noopener"><svg><use href="#i-cafe"/></svg>카페</a></li>
-      </ul>
+  <div class="container end-inner">
+    <h2>어떤 AI 교육이<br />필요할까요?</h2>
+    <div class="end-actions">
+      <a href="#contact" class="btn btn-accent btn-lg">교육신청하기 <svg><use href="#i-arrow"/></svg></a>
+      <a href="tel:070-8019-3355" class="btn btn-glass btn-lg"><svg><use href="#i-phone"/></svg>070-8019-3355</a>
     </div>
-
-    <form class="contact-form" id="contactForm" novalidate>
-      <input type="hidden" name="type" value="기관 맞춤교육 문의" />
-      <input type="hidden" name="orgType" value="" />
-      <label class="hp" aria-hidden="true">홈페이지 <input name="_honey" tabindex="-1" autocomplete="off" /></label>
-      <div class="form-row two">
-        <input name="org" required placeholder="기관명 *" aria-label="기관명 (필수)" />
-        <input name="name" required placeholder="담당자 *" aria-label="담당자 (필수)" />
-      </div>
-      <div class="form-row two">
-        <input name="phone" type="tel" inputmode="numeric" autocomplete="tel" maxlength="13" required placeholder="연락처 * 010-0000-0000" aria-label="연락처 (필수)" />
-        <input name="email" type="email" placeholder="이메일" aria-label="이메일" />
-      </div>
-      <input name="target" placeholder="교육대상·인원 (예: 사회복지사 25명)" aria-label="교육대상·인원" />
-      <div class="form-row two">
-        <select name="hours" aria-label="1회 교육시간">
-          <option value="">1회 교육시간</option>
-          <option value="1~2시간 (기조강연)">1~2시간 (기조강연)</option>
-          <option>3시간</option><option>4시간</option><option>5시간</option><option>6시간</option><option>7시간</option><option>8시간</option>
-          <option>협의</option>
-        </select>
-        <select name="sessions" aria-label="회차">
-          <option value="">회차</option>
-          <option>1회</option><option>2회</option><option>3회</option><option>4회</option><option>5회</option>
-          <option>6회</option><option>7회</option><option>8회</option><option>9회</option><option>10회</option>
-          <option>협의</option>
-        </select>
-      </div>
-      <p class="hours-hint" id="hoursHint" aria-live="polite"></p>
-      <fieldset class="date-field">
-        <legend><svg><use href="#i-calendar"/></svg>희망 교육일 <small>달력에서 선택 · 회차를 고르면 회차별로 선택</small></legend>
-        <div class="date-list" id="dateList"></div>
-      </fieldset>
-      <div class="topic-custom">
-        <label for="customTopic"><svg><use href="#i-sparkle"/></svg>희망 교육 주제 <small>직접 입력</small></label>
-        <input id="customTopic" name="customTopic" placeholder="예: 사례관리 기록에 AI 활용, 직원 대상 ChatGPT 입문" />
-      </div>
-      <details class="topic-field">
-        <summary>또는 20개 과정에서 선택 <span id="topicCount"></span></summary>
-        <div class="topic-chips" id="topicChips"></div>
-      </details>
-      <textarea name="message" rows="3" placeholder="문의내용" aria-label="문의내용"></textarea>
-      <label class="agree"><input type="checkbox" name="agree" required /> 개인정보 수집·이용 동의 (문의 응대용)</label>
-      <button type="submit" class="btn btn-accent btn-lg btn-block">교육신청 <svg><use href="#i-arrow"/></svg></button>
-      <p class="form-note">신청 내용은 담당자에게 바로 전달됩니다 · <button type="button" class="link-btn" id="copyForm">내용 복사</button></p>
-      <p class="form-msg" id="formMsg" role="status"></p>
-    </form>
+    <ul class="contact-list">
+      <li><a href="https://blog.naver.com/mediahelper" target="_blank" rel="noopener"><svg><use href="#i-blog"/></svg>블로그</a></li>
+      <li><a href="https://cafe.naver.com/mediahelper" target="_blank" rel="noopener"><svg><use href="#i-cafe"/></svg>카페</a></li>
+    </ul>
   </div>
 </section>
 
@@ -459,7 +467,7 @@
 </footer>
 
 <aside class="quick-menu" aria-label="빠른 문의">
-  <a href="#contact" class="qm-main" aria-label="교육문의"><svg><use href="#i-chat"/></svg></a>
+  <a href="#contact" class="qm-main" aria-label="교육신청"><svg><use href="#i-chat"/></svg></a>
   <a href="tel:070-8019-3355" aria-label="전화문의"><svg><use href="#i-phone"/></svg></a>
   <a href="mailto:mediahelper2020@gmail.com" aria-label="이메일 문의"><svg><use href="#i-mail"/></svg></a>
   <button type="button" id="toTop" aria-label="맨 위로"><svg><use href="#i-up"/></svg></button>
@@ -467,7 +475,7 @@
 
 <div class="mobile-bar">
   <a href="tel:070-8019-3355" aria-label="전화문의"><svg><use href="#i-phone"/></svg></a>
-  <a href="#contact" class="mb-main">교육 문의하기</a>
+  <a href="#contact" class="mb-main">교육신청하기</a>
 </div>
 
 <div class="modal" id="modal" hidden>

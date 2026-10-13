@@ -313,94 +313,32 @@
     if (preset) { form.elements.type.value = preset.dataset.presetType; }
   });
 
-  /* =========================================================
-     CUSTOM — 맞춤교육 빌더
-     ========================================================= */
-  const builder = $("#builder");
-  const state = { org: "center", hours: 6, sessions: 1, level: "beginner" };
-  const NUM_KEYS = ["hours", "sessions"];
+  /* 강사 이력: 화면에 바로 표시 */
+  const careerList = $("#careerList");
+  if (careerList) careerList.innerHTML = PROFILE.map(([k, v]) => `<li><b class="${k === "現" ? "now" : ""}">${esc(k)}</b><span>${esc(v)}</span></li>`).join("");
 
-  $$(".choice-group", builder).forEach((g) => {
-    const key = g.dataset.group;
-    g.innerHTML = CUSTOM_OPTIONS[key].map((o) => `
-      <button type="button" class="choice" data-key="${key}" data-val="${o.id}" aria-pressed="false">
-        ${esc(o.label)}${o.note ? `<small>${esc(o.note)}</small>` : ""}
-      </button>`).join("");
-  });
-  builder.addEventListener("click", (e) => {
-    const c = e.target.closest(".choice");
-    if (!c) return;
-    const key = c.dataset.key;
-    if (c.disabled) return;
-    state[key] = NUM_KEYS.includes(key) ? Number(c.dataset.val) : c.dataset.val;
-    if (key === "hours" && state.hours <= 2) state.sessions = 1; // 기조강연은 1회
-    $$(".example-chip").forEach((x) => x.classList.remove("active"));
-    renderBuilder();
-  });
-  $$(".example-chip").forEach((chip) => chip.addEventListener("click", () => {
-    const [org, hours, level, sessions] = chip.dataset.example.split(",");
-    Object.assign(state, { org, hours: Number(hours), level, sessions: Number(sessions) || 1 });
-    $$(".example-chip").forEach((x) => x.classList.toggle("active", x === chip));
-    renderBuilder();
-    if (window.innerWidth <= 1024) builder.scrollIntoView({ behavior: "smooth", block: "start" });
-  }));
-
-  function buildPlan() {
-    const org = CUSTOM_OPTIONS.org.find((o) => o.id === state.org);
-    const lvl = CUSTOM_OPTIONS.level.find((o) => o.id === state.level);
-    const hrs = CUSTOM_OPTIONS.hours.find((o) => o.id === state.hours);
-    const keynote = hrs.id <= 2;
-    const ses = keynote ? 1 : state.sessions;
-    const total = hrs.id * ses;
-    let mods = [...org.modules];
-    if (lvl.id === "beginner") mods.unshift(lvl.intro);
-    if (lvl.id === "advanced") mods.push(lvl.intro);
-    if (keynote) {
-      mods = ["AI 시대의 사회복지 (기조강연)", `${org.modules[0]} 활용 사례`];
-    } else {
-      const take = total <= 3 ? 3 : total <= 5 ? 4 : mods.length;
-      mods = mods.slice(0, take);
-      if (total >= 12) mods.push("현장 적용 프로젝트");
-    }
-    const hasSafety = mods.some((m) => /개인정보|민감정보/.test(m));
-    const courses = [...new Set([...(lvl.id === "beginner" ? [lvl.course] : []), ...org.courses, ...(lvl.id === "advanced" ? [9] : [])])].slice(0, 3);
-    const timeLabel = keynote ? "1~2시간 기조강연 (1회)" : ses > 1 ? `${hrs.id}시간 × ${ses}회 (총 ${total}시간)` : `${hrs.id}시간`;
-    return { org, lvl, hrs, ses, total, keynote, timeLabel, mods, hasSafety, courses };
-  }
-
-  function renderBuilder() {
-    $$(".choice", builder).forEach((c) => {
-      const val = NUM_KEYS.includes(c.dataset.key) ? Number(c.dataset.val) : c.dataset.val;
-      c.setAttribute("aria-pressed", String(state[c.dataset.key] === val));
-      if (c.dataset.key === "sessions") c.disabled = state.hours <= 2 && val !== 1;
-    });
-    const p = buildPlan();
-    const chips = p.mods.map((m) => `<span>${esc(m)}</span>`);
-    if (!p.hasSafety) chips.push(`<span class="safe">개인정보 보호</span>`);
-    $("#builderResult").innerHTML = `
-      <p class="br-time">${icon("clock")}${esc(p.timeLabel)}</p>
-      <div class="br-modules">${chips.join("")}</div>
-      <div class="br-courses">
-        ${p.courses.map((no) => { const c = courseOf(no); return `<button type="button" data-open-course="${no}"><b>${pad(no)}</b>${esc(c.title)}</button>`; }).join("")}
-      </div>`;
-  }
-  renderBuilder();
-
-  $("#builderCta").addEventListener("click", (e) => {
-    e.preventDefault();
-    const p = buildPlan();
-    const orgMap = { center: "사회복지관", ltc: "장기요양기관", disability: "장애인복지시설", child: "아동복지기관", mental: "정신건강복지기관", manager: "" };
-    form.elements.type.value = "기관 맞춤교육 문의";
-    if (orgMap[p.org.id]) form.elements.orgType.value = orgMap[p.org.id];
-    form.elements.hours.value = p.keynote ? "1~2시간 (기조강연)" : p.hrs.label;
-    form.elements.sessions.value = `${p.ses}회`;
-    updateHoursHint();
-    if (!form.elements.target.value) form.elements.target.value = p.org.id === "manager" ? "관리자" : p.lvl.label;
-    selectTopics(p.courses);
-    const mods = p.mods.concat(p.hasSafety ? [] : ["개인정보 보호"]).join(" + ");
-    if (!form.elements.message.value.trim()) form.elements.message.value = `[맞춤교육 미리보기] ${p.org.label} / ${p.timeLabel} / ${p.lvl.label}\n희망 구성: ${mods}`;
-    goContact();
-  });
+  /* 강의의뢰서 메일 작성: 양식이 채워진 메일 창 열기 */
+  const REQUEST_SUBJECT = "[강의의뢰서] 기관명 - 교육명";
+  const REQUEST_BODY = [
+    "안녕하세요, 복지인사이트 이창희 대표님.",
+    "아래와 같이 강의를 의뢰드립니다.",
+    "",
+    "■ 기관명 :",
+    "■ 담당자 / 연락처 :",
+    "■ 교육명(주제) :",
+    "■ 교육대상 및 인원 :",
+    "■ 교육일시 (회차별) :",
+    "■ 교육시간 (1회 3~8시간 / 1~2시간은 기조강연) :",
+    "■ 교육장소 (대면 주소 / 온라인) :",
+    "■ 실습환경 (PC·노트북·와이파이 여부) :",
+    "■ 강사료 및 예산 :",
+    "■ 요청사항 :",
+    "",
+    "※ 공문이나 의뢰서 파일이 있으면 첨부해 주세요.",
+  ].join("\n");
+  const reqMail = $("#requestMail"), reqGmail = $("#requestGmail");
+  if (reqMail) reqMail.href = `mailto:${CONTACT.email}?subject=${encodeURIComponent(REQUEST_SUBJECT)}&body=${encodeURIComponent(REQUEST_BODY)}`;
+  if (reqGmail) reqGmail.href = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(CONTACT.email)}&su=${encodeURIComponent(REQUEST_SUBJECT)}&body=${encodeURIComponent(REQUEST_BODY)}`;
 
   /* =========================================================
      PRACTICE / PORTFOLIO / REVIEWS / FAQ
@@ -784,7 +722,7 @@
   const splitObs = new IntersectionObserver((entries) => {
     entries.forEach((en) => { if (en.isIntersecting) { en.target.classList.add("in"); splitObs.unobserve(en.target); } });
   }, { threshold: 0.3 });
-  $$(".head h2, .custom-copy h2, .contact-copy h2").forEach((h) => {
+  $$(".head h2, .apply-head h2, .end-cta h2").forEach((h) => {
     h.innerHTML = h.innerHTML.split(/<br\s*\/?>/i).map((part) => `<span class="line"><span>${part.trim()}</span></span>`).join("");
     h.classList.add("split");
     splitObs.observe(h);
