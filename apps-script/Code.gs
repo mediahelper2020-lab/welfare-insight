@@ -1,20 +1,27 @@
 /**
  * 복지인사이트 교육신청 수신기 (Google Apps Script)
  * ------------------------------------------------------------
- * 홈페이지 문의폼 → 이 스크립트(웹앱) → ① 구글 시트에 한 줄 저장
- *                                      ② 담당자 휴대폰으로 문자(SMS/LMS) 알림
- *                                      ③ (선택) 담당자 이메일 알림, 신청자 접수확인 문자
+ * 홈페이지 신청 → ① 구글 시트에 한 줄 저장  ② 담당자 휴대폰으로 문자 알림  ③ 담당자 이메일 알림
  *
- * 설치 방법은 apps-script/README.md 를 참고하세요.
+ * ★ 사용 방법 (3단계)
+ *   1) 아래 [설정] 칸에 솔라피 API Key·Secret, 발신번호, 알림 받을 휴대폰 번호를 입력하고 저장(💾)
+ *   2) 위쪽 함수 목록에서 「시작하기」를 고르고 ▶실행 → 권한 허용 → 휴대폰으로 시험 문자 도착 확인
+ *   3) 오른쪽 위 [배포] → [새 배포] → 유형 ⚙️「웹 앱」, 액세스 권한「모든 사용자」→ 배포 → 웹 앱 URL 복사
  *
- * [스크립트 속성] 프로젝트 설정 → 스크립트 속성에 아래 값을 넣습니다.
- *   SOLAPI_API_KEY      솔라피(SOLAPI) API Key
- *   SOLAPI_API_SECRET   솔라피 API Secret
- *   SMS_FROM            솔라피에 등록한 발신번호 (예: 07080193355)
- *   ADMIN_PHONE         알림 받을 휴대폰 번호, 여러 개면 쉼표로 구분 (예: 01012345678)
- *   ADMIN_EMAIL         (선택) 알림 받을 이메일. 비우면 이메일 알림 안 함
- *   NOTIFY_APPLICANT    (선택) true 로 두면 신청자에게도 접수확인 문자 발송
+ * ※ 이 스크립트는 원장님 구글 계정 안에만 저장되어 외부에 보이지 않습니다.
+ *   API Secret을 홈페이지 코드에 넣으면 누구나 볼 수 있으니, 반드시 여기에만 넣으세요.
  */
+
+/* ======================= [설정] 여기만 채우세요 ======================= */
+const CONFIG = {
+  SOLAPI_API_KEY: '',            // 솔라피 API Key
+  SOLAPI_API_SECRET: '',         // 솔라피 API Secret
+  SMS_FROM: '07080193355',       // 솔라피에 등록한 발신번호 (숫자만)
+  ADMIN_PHONE: '',               // 알림 받을 휴대폰 (여러 명이면 '01011112222,01033334444')
+  ADMIN_EMAIL: 'mediahelper2020@gmail.com', // 이메일 알림 (원하지 않으면 '')
+  NOTIFY_APPLICANT: 'false',     // 'true' 로 바꾸면 신청자에게도 "접수되었습니다" 문자 발송
+};
+/* ===================================================================== */
 
 const SHEET_NAME = '신청내역';
 
@@ -122,6 +129,19 @@ function setup() {
   console.log('시트 준비 완료: ' + SpreadsheetApp.getActiveSpreadsheet().getUrl());
 }
 
+/* ▶ 처음 한 번 실행: 시트 준비 + 시험 문자 발송 */
+function 시작하기() {
+  const p = props_();
+  const missing = ['SOLAPI_API_KEY', 'SOLAPI_API_SECRET', 'SMS_FROM', 'ADMIN_PHONE'].filter((k) => !p[k]);
+  setup();
+  if (missing.length) {
+    console.log('⚠️ [설정]에 아직 비어 있는 칸이 있습니다: ' + missing.join(', ') + ' → 채운 뒤 다시 실행하세요.');
+    return;
+  }
+  testSms();
+  console.log('✅ 준비 완료! 휴대폰으로 시험 문자가 왔는지 확인한 뒤 [배포] → [새 배포] → 웹 앱 으로 배포하세요.');
+}
+
 /* 설정 확인용: 담당자에게 시험 문자를 보냅니다. */
 function testSms() {
   const result = notifyAdmin_({
@@ -217,8 +237,12 @@ function colOf_(key) {
   return COLUMNS.findIndex(([k]) => k === key) + 1;
 }
 
+// [설정] 값 + (있으면) 스크립트 속성 값. 스크립트 속성이 우선합니다.
 function props_() {
-  return PropertiesService.getScriptProperties().getProperties();
+  const saved = PropertiesService.getScriptProperties().getProperties();
+  const out = Object.assign({}, CONFIG);
+  Object.keys(saved).forEach((k) => { if (saved[k]) out[k] = saved[k]; });
+  return out;
 }
 
 function parseBody_(e) {
