@@ -19,7 +19,7 @@ const CONFIG = {
   SMS_FROM: '07080193355',       // 솔라피에 등록한 발신번호 (숫자만)
   ADMIN_PHONE: '',               // 알림 받을 휴대폰 (여러 명이면 '01011112222,01033334444')
   ADMIN_EMAIL: 'mediahelper2020@gmail.com', // 이메일 알림 (원하지 않으면 '')
-  NOTIFY_APPLICANT: 'false',     // 'true' 로 바꾸면 신청자에게도 "접수되었습니다" 문자 발송
+  NOTIFY_APPLICANT: 'true',      // 신청자에게 "정상 접수되었습니다" 안내 문자 발송 (끄려면 'false')
 };
 /* ===================================================================== */
 
@@ -36,7 +36,7 @@ const COLUMNS = [
   ['phone', '연락처'],
   ['email', '이메일'],
   ['target', '교육대상·인원'],
-  ['date', '희망일정'],
+  ['date', '희망교육일'],
   ['hours', '교육시간'],
   ['customTopic', '희망주제(직접입력)'],
   ['topics', '희망과정'],
@@ -74,7 +74,7 @@ function doPost(e) {
       phone: formatPhone_(data.phone),
       email: clean_(data.email),
       target: clean_(data.target),
-      date: clean_(data.date),
+      date: clean_(data.date, 400),
       hours: clean_(data.hours),
       customTopic: clean_(data.customTopic, 300),
       topics: clean_(data.topics, 1000),
@@ -89,10 +89,10 @@ function doPost(e) {
     const rowIndex = sheet.getLastRow();
 
     // 알림은 저장 이후에 — 문자 발송이 실패해도 신청 내용은 시트에 남습니다.
-    const smsResult = notifyAdmin_(row);
-    sheet.getRange(rowIndex, colOf_('smsResult')).setValue(smsResult);
+    const adminSms = notifyAdmin_(row);
+    const applicantSms = notifyApplicant_(row);
+    sheet.getRange(rowIndex, colOf_('smsResult')).setValue(`담당자: ${adminSms} / 신청자: ${applicantSms}`);
     notifyEmail_(row);
-    notifyApplicant_(row);
 
     return json_({ ok: true });
   } catch (err) {
@@ -155,30 +155,43 @@ function testSms() {
    알림
    ============================================================ */
 
+// 담당자(내 폰)에게: 신청 내용을 정리한 문자
 function notifyAdmin_(row) {
   const p = props_();
   if (!p.SOLAPI_API_KEY || !p.SOLAPI_API_SECRET || !p.SMS_FROM || !p.ADMIN_PHONE) return '미설정';
 
+  const cut = (v, n) => (v.length > n ? v.slice(0, n) + '…' : v);
   const lines = [
-    '[복지인사이트] 교육신청 접수',
-    `기관: ${row.org}${row.orgType ? ` (${row.orgType})` : ''}`,
-    `담당: ${row.name} ${row.phone}`,
-    row.target && `대상: ${row.target}`,
-    row.date && `일정: ${row.date}`,
-    row.hours && `시간: ${row.hours}`,
-    row.customTopic && `주제: ${row.customTopic}`,
-    row.topics && `과정: ${row.topics}`,
+    '[복지인사이트 교육신청]',
+    `■ 기관: ${row.org}${row.orgType ? ` (${row.orgType})` : ''}`,
+    `■ 담당: ${row.name} / ${row.phone}`,
+    row.email && `■ 이메일: ${row.email}`,
+    row.target && `■ 대상: ${row.target}`,
+    row.date && `■ 희망일: ${row.date}`,
+    row.hours && `■ 시간: ${row.hours}`,
+    row.customTopic && `■ 희망주제: ${row.customTopic}`,
+    row.topics && `■ 희망과정: ${cut(row.topics, 300)}`,
+    row.message && `■ 문의: ${cut(row.message, 400)}`,
+    `■ 접수: ${Utilities.formatDate(row.receivedAt || new Date(), 'Asia/Seoul', 'yyyy-MM-dd HH:mm')}`,
   ].filter(Boolean);
 
   const results = p.ADMIN_PHONE.split(',').map((to) => sendSms_(to, lines.join('\n')));
   return results.every((r) => r.ok) ? '발송완료' : '실패: ' + results.map((r) => r.error).filter(Boolean).join(' / ');
 }
 
+// 신청자에게: 정상 접수 안내 문자 (휴대폰 번호일 때만)
 function notifyApplicant_(row) {
   const p = props_();
-  if (String(p.NOTIFY_APPLICANT) !== 'true' || !p.SOLAPI_API_KEY) return;
-  const text = `[복지인사이트] ${row.name}님, ${row.org} 교육신청이 접수되었습니다. 확인 후 연락드리겠습니다. 문의 ${p.SMS_FROM}`;
-  sendSms_(row.phone, text);
+  if (String(p.NOTIFY_APPLICANT) !== 'true' || !p.SOLAPI_API_KEY || !p.SOLAPI_API_SECRET || !p.SMS_FROM) return '꺼짐';
+  if (!/^01\d{8,9}$/.test(digits_(row.phone))) return '휴대폰 아님';
+  const text = [
+    `[복지인사이트] ${row.name}님, 교육신청이 정상적으로 접수되었습니다.`,
+    '담당자가 신청 내용을 확인한 뒤 연락드리겠습니다.',
+    '감사합니다.',
+    `문의 ${formatPhone_(p.SMS_FROM)}`,
+  ].join('\n');
+  const r = sendSms_(row.phone, text);
+  return r.ok ? '발송완료' : '실패: ' + r.error;
 }
 
 function notifyEmail_(row) {

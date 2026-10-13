@@ -476,6 +476,55 @@
   $("#topicChips").innerHTML = COURSES.map((c) => `
     <label class="topic-chip"><input type="checkbox" name="topics" value="${c.no}" /><span><b>${pad(c.no)}</b>${esc(c.title)}</span></label>`).join("");
 
+  /* 연락처: 입력하는 대로 하이픈 자동 정리 (010-1234-5678, 02-123-4567, 070-8019-3355) */
+  function formatPhone(v) {
+    const d = v.replace(/\D/g, "").slice(0, 11);
+    if (d.startsWith("02")) {
+      if (d.length <= 2) return d;
+      if (d.length <= 5) return `${d.slice(0, 2)}-${d.slice(2)}`;
+      if (d.length <= 9) return `${d.slice(0, 2)}-${d.slice(2, 5)}-${d.slice(5)}`;
+      return `${d.slice(0, 2)}-${d.slice(2, 6)}-${d.slice(6, 10)}`;
+    }
+    if (d.length <= 3) return d;
+    if (d.length <= 6) return `${d.slice(0, 3)}-${d.slice(3)}`;
+    if (d.length <= 10) return `${d.slice(0, 3)}-${d.slice(3, 6)}-${d.slice(6)}`;
+    return `${d.slice(0, 3)}-${d.slice(3, 7)}-${d.slice(7)}`;
+  }
+  form.elements.phone.addEventListener("input", (e) => {
+    const el = e.target;
+    const atEnd = el.selectionStart === el.value.length;
+    el.value = formatPhone(el.value);
+    if (atEnd) el.setSelectionRange(el.value.length, el.value.length);
+  });
+
+  /* 희망 교육일: 달력(date) 입력, 회차 수만큼 표시 */
+  const dateList = $("#dateList");
+  const WEEK = ["일", "월", "화", "수", "목", "금", "토"];
+  const todayISO = () => { const t = new Date(); t.setMinutes(t.getMinutes() - t.getTimezoneOffset()); return t.toISOString().slice(0, 10); };
+  function renderDates(clear) {
+    const n = Math.max(1, Math.min(10, parseInt(form.elements.sessions.value, 10) || 1));
+    const prev = clear ? [] : $$("input", dateList).map((i) => i.value);
+    dateList.innerHTML = Array.from({ length: n }, (_, i) => `
+      <label class="date-item${n === 1 ? " single" : ""}">
+        ${n > 1 ? `<span>${i + 1}회차</span>` : ""}
+        <input type="date" min="${todayISO()}" value="${prev[i] || ""}" aria-label="${n > 1 ? `${i + 1}회차 ` : ""}희망 교육일" />
+      </label>`).join("");
+  }
+  function dateText() {
+    const vals = $$("input", dateList).map((i) => i.value);
+    const fmt = (v) => { const d = new Date(v + "T00:00:00"); return `${v.replace(/-/g, ".")}(${WEEK[d.getDay()]})`; };
+    if (vals.length === 1) return vals[0] ? fmt(vals[0]) : "";
+    const picked = vals.map((v, i) => v && `${i + 1}회차 ${fmt(v)}`).filter(Boolean);
+    return picked.join(", ");
+  }
+  // 날짜 칸을 누르면 바로 달력이 열리도록
+  dateList.addEventListener("click", (e) => {
+    const input = e.target.closest("input[type=date]");
+    if (input && input.showPicker) { try { input.showPicker(); } catch (_) {} }
+  });
+  form.elements.sessions.addEventListener("change", () => renderDates());
+  renderDates();
+
   /* 교육시간: 1회 시간 × 회차 */
   const hoursHint = $("#hoursHint");
   function timeText() {
@@ -493,6 +542,7 @@
     sesSel.disabled = keynote;
     const h = parseInt(form.elements.hours.value, 10), n = parseInt(sesSel.value, 10);
     markSelects();
+    if ($$("input", dateList).length !== (Math.max(1, Math.min(10, n || 1)))) renderDates();
     hoursHint.innerHTML = keynote
       ? "1~2시간은 <b>기조강연</b> 형태로만 진행됩니다."
       : h && n > 1 ? `총 <b>${h * n}시간</b> (${n}회 × ${h}시간)` : "";
@@ -533,7 +583,7 @@
       ["연락처", f.phone.value],
       ["이메일", f.email.value],
       ["교육대상·인원", f.target.value],
-      ["희망일정", f.date.value],
+      ["희망 교육일", dateText()],
       ["교육시간", timeText()],
       ["희망 교육주제(직접 입력)", f.customTopic.value],
       ["희망 교육과정", topics.join(", ")],
@@ -549,6 +599,8 @@
       el.classList.toggle("invalid", bad);
       if (bad) ok = false;
     });
+    const phoneDigits = form.elements.phone.value.replace(/\D/g, "");
+    if (phoneDigits && !/^0\d{8,10}$/.test(phoneDigits)) { form.elements.phone.classList.add("invalid"); ok = false; }
     const agree = form.elements.agree;
     agree.closest(".agree").classList.toggle("invalid", !agree.checked);
     if (!agree.checked) ok = false;
@@ -569,7 +621,7 @@
     const topics = $$('input[name="topics"]:checked', form).map((cb) => { const c = courseOf(cb.value); return `${pad(c.no)} ${c.title}`; });
     const data = {
       "문의 유형": f.type.value, "기관명": f.org.value, "기관 유형": f.orgType.value, "담당자": f.name.value,
-      "연락처": f.phone.value, "이메일": f.email.value, "교육대상·인원": f.target.value, "희망일정": f.date.value,
+      "연락처": f.phone.value, "이메일": f.email.value, "교육대상·인원": f.target.value, "희망 교육일": dateText(),
       "교육시간": timeText(), "희망 교육주제(직접 입력)": f.customTopic.value, "희망 교육과정": topics.join(", "), "문의내용": f.message.value,
     };
     Object.keys(data).forEach((k) => { data[k] = String(data[k]).trim(); if (!data[k]) delete data[k]; });
@@ -587,7 +639,7 @@
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
           type: f.type.value, org: f.org.value, orgType: f.orgType.value, name: f.name.value,
-          phone: f.phone.value, email: f.email.value, target: f.target.value, date: f.date.value,
+          phone: f.phone.value, email: f.email.value, target: f.target.value, date: dateText(),
           hours: timeText(), customTopic: f.customTopic.value, topics: topics.join(", "),
           message: f.message.value, agree: f.agree.checked, _honey: f._honey.value,
         }),
@@ -600,21 +652,21 @@
     }
   }
 
-  function showDone() {
-    form.classList.add("is-done");
-    form.insertAdjacentHTML("beforeend", `
-      <div class="form-done" role="status">
+  // 신청 완료 안내창
+  function showDone(smsSent) {
+    const name = esc(form.elements.name.value.trim());
+    const phone = esc(form.elements.phone.value.trim());
+    openModal(`
+      <div class="done-pop">
         <span class="fd-icon">${icon("check")}</span>
-        <h3>신청이 접수되었습니다</h3>
-        <p>${esc(form.elements.name.value.trim())}님, 확인 후 빠르게 연락드리겠습니다.<br />급한 문의는 <a href="tel:${CONTACT.phone}">${CONTACT.phone}</a></p>
-        <button type="button" class="btn btn-line" id="formAgain">새 신청 작성</button>
+        <h2>교육신청해 주셔서 감사합니다</h2>
+        <p><b>${name}</b>님의 신청이 정상적으로 접수되었습니다.<br />담당자가 신청 내용을 확인한 뒤 빠르게 연락드리겠습니다.${smsSent ? `<br /><small>입력하신 연락처(${phone})로 접수 안내 문자가 발송됩니다.</small>` : ""}</p>
+        <p><small>급한 문의 <a href="tel:${CONTACT.phone}">${CONTACT.phone}</a></small></p>
+        <div class="md-actions"><button type="button" class="btn btn-accent" data-close>확인</button></div>
       </div>`);
-    $("#formAgain").addEventListener("click", () => {
-      form.reset(); updateTopicCount(); updateHoursHint();
-      form.classList.remove("is-done");
-      $(".form-done", form).remove();
-      formMsg.textContent = "";
-    });
+    form.reset();
+    updateTopicCount(); updateHoursHint(); renderDates(true);
+    formMsg.textContent = "";
   }
 
   const submitBtn = $('button[type="submit"]', form);
@@ -623,7 +675,7 @@
     if (submitBtn.disabled) return;
     if (!validate()) {
       formMsg.className = "form-msg err";
-      formMsg.textContent = "필수 항목(기관명·담당자·연락처)과 개인정보 동의를 확인해 주세요.";
+      formMsg.textContent = "필수 항목(기관명·담당자·연락처)과 개인정보 동의를 확인해 주세요. 연락처는 숫자만 입력해도 자동으로 정리됩니다.";
       const first = $(".invalid", form);
       if (first) (first.matches("input,select,textarea") ? first : $("input", first)).focus();
       return;
@@ -648,7 +700,7 @@
     formMsg.textContent = "";
     try {
       // ① 구글 시트 저장 + 문자 알림 (Apps Script) — 설정된 경우
-      if (CONTACT.formEndpoint && await sendToSheet()) { showDone(); return; }
+      if (CONTACT.formEndpoint && await sendToSheet()) { showDone(true); return; }
       if (location.protocol === "file:") { fail("전송에 실패했습니다. 홈페이지 주소(웹에 올린 사이트)에서 다시 시도해 주세요."); return; }
 
       // ② 메일 전송 (FormSubmit) — 시트 미설정이거나 시트 전송 실패 시
@@ -664,7 +716,7 @@
         }),
       });
       const out = await res.json().catch(() => ({}));
-      if (res.ok && String(out.success) === "true") { showDone(); return; }
+      if (res.ok && String(out.success) === "true") { showDone(false); return; }
       const msg = String(out.message || "");
       if (/activat/i.test(msg)) {
         // 처음 한 번: 받는 메일 주소 인증이 필요한 상태

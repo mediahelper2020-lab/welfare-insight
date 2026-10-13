@@ -465,6 +465,22 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .agree.invalid { color: #ff7a7a; }
 .form-note { font-size: 13.5px; color: var(--dim); text-align: center; }
 .form-msg { font-size: 14.5px; font-weight: 700; text-align: center; }
+.date-field { margin: 0; padding: 14px 16px 16px; border: 0; border-radius: 14px; background: rgba(0,0,0,.3); box-shadow: inset 0 0 0 1px var(--stroke); }
+.date-field legend { float: left; width: 100%; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 0; margin-bottom: 10px; font-size: 14.5px; font-weight: 700; color: var(--cream); }
+.date-field legend svg { color: var(--accent); }
+.date-field legend small { font-size: 12.5px; font-weight: 500; color: var(--dim); }
+.date-list { clear: both; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
+.date-item { position: relative; display: block; }
+.date-item span { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 12px; font-weight: 800; color: var(--accent); pointer-events: none; }
+.contact-form .date-item input { color-scheme: dark; padding: 13px 12px 13px 52px; cursor: pointer; }
+.contact-form .date-item.single input { padding-left: 16px; }
+.contact-form .date-item input::-webkit-calendar-picker-indicator { cursor: pointer; filter: invert(.7) sepia(1) saturate(4) hue-rotate(350deg); }
+.done-pop { text-align: center; padding: 10px 0 4px; }
+.done-pop .fd-icon { margin: 0 auto 20px; }
+.done-pop h2 { font-size: clamp(24px, 3vw, 30px); font-weight: 900; letter-spacing: -0.04em; padding: 0 !important; }
+.done-pop p { margin-top: 14px; color: var(--l-muted); font-size: 16px; line-height: 1.7; }
+.done-pop p b { color: var(--l-text); }
+.done-pop .md-actions { justify-content: center; }
 .hours-hint { font-size: 13.5px; color: var(--muted); padding: 0 4px; margin-top: -2px; }
 .hours-hint:empty { display: none; }
 .hours-hint b { color: var(--accent); }

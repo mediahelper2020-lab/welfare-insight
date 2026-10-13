@@ -41,6 +41,7 @@
     <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M13.5 4l-3 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m8 12.3 2.8 2.7L16.2 9.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 10h17M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
     <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3.5 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
     <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
@@ -404,13 +405,10 @@
         <input name="name" required placeholder="담당자 *" aria-label="담당자 (필수)" />
       </div>
       <div class="form-row two">
-        <input name="phone" type="tel" required placeholder="연락처 *" aria-label="연락처 (필수)" />
+        <input name="phone" type="tel" inputmode="numeric" autocomplete="tel" maxlength="13" required placeholder="연락처 * 010-0000-0000" aria-label="연락처 (필수)" />
         <input name="email" type="email" placeholder="이메일" aria-label="이메일" />
       </div>
-      <div class="form-row two">
-        <input name="target" placeholder="대상·인원" aria-label="교육대상·인원" />
-        <input name="date" placeholder="희망일정" aria-label="희망일정" />
-      </div>
+      <input name="target" placeholder="교육대상·인원 (예: 사회복지사 25명)" aria-label="교육대상·인원" />
       <div class="form-row two">
         <select name="hours" aria-label="1회 교육시간">
           <option value="">1회 교육시간</option>
@@ -426,6 +424,10 @@
         </select>
       </div>
       <p class="hours-hint" id="hoursHint" aria-live="polite"></p>
+      <fieldset class="date-field">
+        <legend><svg><use href="#i-calendar"/></svg>희망 교육일 <small>달력에서 선택 · 회차를 고르면 회차별로 선택</small></legend>
+        <div class="date-list" id="dateList"></div>
+      </fieldset>
       <div class="topic-custom">
         <label for="customTopic"><svg><use href="#i-sparkle"/></svg>희망 교육 주제 <small>직접 입력</small></label>
         <input id="customTopic" name="customTopic" placeholder="예: 사례관리 기록에 AI 활용, 직원 대상 ChatGPT 입문" />
@@ -436,8 +438,8 @@
       </details>
       <textarea name="message" rows="3" placeholder="문의내용" aria-label="문의내용"></textarea>
       <label class="agree"><input type="checkbox" name="agree" required /> 개인정보 수집·이용 동의 (문의 응대용)</label>
-      <button type="submit" class="btn btn-accent btn-lg btn-block">문의 보내기 <svg><use href="#i-arrow"/></svg></button>
-      <p class="form-note">담당자 메일로 바로 전달됩니다 · <button type="button" class="link-btn" id="copyForm">내용 복사</button></p>
+      <button type="submit" class="btn btn-accent btn-lg btn-block">교육신청 <svg><use href="#i-arrow"/></svg></button>
+      <p class="form-note">신청 내용은 담당자에게 바로 전달됩니다 · <button type="button" class="link-btn" id="copyForm">내용 복사</button></p>
       <p class="form-msg" id="formMsg" role="status"></p>
     </form>
   </div>
