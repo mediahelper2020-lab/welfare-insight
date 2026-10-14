@@ -209,7 +209,7 @@
         </section>
       </div>
       <div class="md-actions">
-        <button type="button" class="btn btn-accent" data-inquire="${c.no}">이 과정으로 교육 문의하기 ${icon("arrow")}</button>
+        <button type="button" class="btn btn-accent" data-inquire="${c.no}">이 과정으로 교육신청하기 ${icon("arrow")}</button>
         <button type="button" class="btn btn-outline" data-open-syllabus>전체 강의계획서 보기</button>
       </div>
       <div class="md-nav">
@@ -226,7 +226,7 @@
         <div>
           <small>WELFARE INSIGHT · 2027</small>
           <h2>복지인사이트 전문교육 강의계획서</h2>
-          <p>현장의 경험에 AI를 더하다 — 4개 분야 20개 과정</p>
+          <p>현장의 경험에 AI를 더하다 — 4개 분야 ${COURSES.length}개 과정</p>
         </div>
         <button type="button" class="btn btn-dark btn-sm no-print" id="printSyllabus">${icon("print")} 인쇄 · PDF 저장</button>
       </div>
