@@ -598,14 +598,13 @@
   }
 
   // 신청 완료 안내창
-  function showDone(smsSent) {
+  function showDone() {
     const name = esc(form.elements.name.value.trim());
-    const phone = esc(form.elements.phone.value.trim());
     openModal(`
       <div class="done-pop">
         <span class="fd-icon">${icon("check")}</span>
         <h2>교육신청해 주셔서 감사합니다</h2>
-        <p><b>${name}</b>님의 신청이 정상적으로 접수되었습니다.<br />담당자가 신청 내용을 확인한 뒤 빠르게 연락드리겠습니다.${smsSent ? `<br /><small>입력하신 연락처(${phone})로 접수 안내 문자가 발송됩니다.</small>` : ""}</p>
+        <p><b>${name}</b>님의 신청이 정상적으로 접수되었습니다.<br />담당자가 신청 내용을 확인한 뒤 빠르게 연락드리겠습니다.</p>
         <p><small>급한 문의 <a href="tel:${CONTACT.phone}">${CONTACT.phone}</a></small></p>
         <div class="md-actions"><button type="button" class="btn btn-accent" data-close>확인</button></div>
       </div>`);
@@ -645,7 +644,7 @@
     formMsg.textContent = "";
     try {
       // ① 구글 시트 저장 + 문자 알림 (Apps Script) — 설정된 경우
-      if (CONTACT.formEndpoint && await sendToSheet()) { showDone(true); return; }
+      if (CONTACT.formEndpoint && await sendToSheet()) { showDone(); return; }
       if (location.protocol === "file:") { fail("전송에 실패했습니다. 홈페이지 주소(웹에 올린 사이트)에서 다시 시도해 주세요."); return; }
 
       // ② 메일 전송 (FormSubmit) — 시트 미설정이거나 시트 전송 실패 시
@@ -661,7 +660,7 @@
         }),
       });
       const out = await res.json().catch(() => ({}));
-      if (res.ok && String(out.success) === "true") { showDone(false); return; }
+      if (res.ok && String(out.success) === "true") { showDone(); return; }
       const msg = String(out.message || "");
       if (/activat/i.test(msg)) {
         // 처음 한 번: 받는 메일 주소 인증이 필요한 상태
