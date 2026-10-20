@@ -733,4 +733,7 @@
     h.classList.add("split");
     splitObs.observe(h);
   });
+  // 강사 소개 문장: 한 줄씩 부드럽게 나타나기
+  const quote = $(".instructor-quote");
+  if (quote) splitObs.observe(quote);
 })();
